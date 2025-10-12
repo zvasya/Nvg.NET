@@ -170,6 +170,7 @@ namespace SilkyNvg.Rendering.OpenGL
         {
             if (_callQueue.HasCalls)
             {
+                Gl.PointSize(2.0f);
                 Shader.Start();
 
                 Gl.Enable(EnableCap.CullFace);

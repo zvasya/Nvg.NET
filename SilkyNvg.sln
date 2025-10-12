@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "graphical", "graphical", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unit", "unit", "{1AEF368B-BEE4-46E5-A5E6-A7DC92BD0FB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FillRuleTest", "tests\graphical\FillRuleTest\FillRuleTest.csproj", "{CD0C1173-12EC-441A-8E9D-1220E1D0CA6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,10 @@ Global
 		{6423184C-D71E-41F3-9EA1-7DC5C5A0EFF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6423184C-D71E-41F3-9EA1-7DC5C5A0EFF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6423184C-D71E-41F3-9EA1-7DC5C5A0EFF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD0C1173-12EC-441A-8E9D-1220E1D0CA6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD0C1173-12EC-441A-8E9D-1220E1D0CA6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD0C1173-12EC-441A-8E9D-1220E1D0CA6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD0C1173-12EC-441A-8E9D-1220E1D0CA6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +164,7 @@ Global
 		{6423184C-D71E-41F3-9EA1-7DC5C5A0EFF4} = {4D7D9FE5-C5F5-4A22-9ACD-0BB5EEF11292}
 		{4D7D9FE5-C5F5-4A22-9ACD-0BB5EEF11292} = {225A277C-EFE4-47D6-A080-4005F7ED1D4C}
 		{1AEF368B-BEE4-46E5-A5E6-A7DC92BD0FB2} = {225A277C-EFE4-47D6-A080-4005F7ED1D4C}
+		{CD0C1173-12EC-441A-8E9D-1220E1D0CA6C} = {4D7D9FE5-C5F5-4A22-9ACD-0BB5EEF11292}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08FE0BD8-4253-419D-9FBF-7F9671C9AAC2}

@@ -311,25 +311,15 @@ namespace SilkyNvg.Rendering
 
         private void ExpandFillFill(float woff, bool fringe)
         {
-            if (fringe)
-            {
-                Point p0 = _points[^1];
-                Point p1 = _points[0];
+            Point p0 = _points[^1];
+            Point p1 = _points[0];
 
-                foreach (Point point in _points)
-                {
-                    p1 = point;
-                    Point.Vertex(p0, p1, woff, _fill);
-
-                    p0 = p1;
-                }
-            }
-            else
+            foreach (Point point in _points)
             {
-                foreach (Point point in _points)
-                {
-                    _fill.Add(new Vertex(point.Position, 0.5f, 1.0f));
-                }
+                p1 = point;
+                Point.Vertex(p0, p1, woff, _fill);
+
+                p0 = p1;
             }
         }
 

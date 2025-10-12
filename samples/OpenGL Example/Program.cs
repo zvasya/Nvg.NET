@@ -8,9 +8,10 @@ using SilkyNvg.Rendering.OpenGL;
 using StbImageWriteSharp;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Numerics;
+using SilkyNvg.Graphics;
+using SilkyNvg.Paths;
 
 namespace OpenGL_Example
 {
@@ -37,7 +38,7 @@ namespace OpenGL_Example
 
         private static float mx, my;
 
-        private static unsafe void KeyDown(IKeyboard _, Key key, int _2)
+        private static void KeyDown(IKeyboard _, Key key, int _2)
         {
             if (key == Key.Escape)
                 window.Close();
@@ -69,7 +70,7 @@ namespace OpenGL_Example
 
             gl = window.CreateOpenGL();
 
-            OpenGLRenderer nvgRenderer = new(CreateFlags.Antialias | CreateFlags.StencilStrokes | CreateFlags.Debug, gl);
+            OpenGLRenderer nvgRenderer = new(CreateFlags.StencilStrokes | CreateFlags.Debug, gl);
             nvg = Nvg.Create(nvgRenderer);
 
             demo = new Demo(nvg);
@@ -105,10 +106,20 @@ namespace OpenGL_Example
 
             nvg.BeginFrame(winSize, pxRatio);
 
-            demo.Render(mx, my, winSize.X, winSize.Y, (float)t, blowup);
+            nvg.BeginPath();
+            nvg.MoveTo(250f, 75f);
+            nvg.LineTo(323f, 301f);
+            nvg.LineTo(131f, 161f);
+            nvg.LineTo(369f, 161f);
+            nvg.LineTo(177f, 301f);
+            nvg.ClosePath();
+            nvg.FillColour(Colour.Red);
+            nvg.Fill();
+            
+            /*demo.Render(mx, my, winSize.X, winSize.Y, (float)t, blowup);
 
             frameGraph.Render(5.0f, 5.0f, nvg);
-            cpuGraph.Render(5.0f + 200.0f + 5.0f, 5.0f, nvg);
+            cpuGraph.Render(5.0f + 200.0f + 5.0f, 5.0f, nvg);*/
 
             nvg.EndFrame();
 
