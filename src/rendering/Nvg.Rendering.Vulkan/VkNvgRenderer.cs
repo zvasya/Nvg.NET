@@ -116,10 +116,10 @@ public class VkNvgRenderer(VkNvgContext createInfo, CreateFlags flags, Queue que
         api.GetPhysicalDeviceMemoryProperties(createInfo.Gpu, &physicalDeviceMemoryProperties);
         _memoryProperties = physicalDeviceMemoryProperties;
         api.GetPhysicalDeviceProperties(createInfo.Gpu, out _gpuProperties);
-        byte[] fillVertShader = File.ReadAllBytes("fillVert.spv");
+        byte[] fillVertShader = File.ReadAllBytes(System.IO.Path.Combine(AppContext.BaseDirectory, "fillVert.spv"));
         
 
-        byte[] fillFragShader = File.ReadAllBytes("fillFrag.spv");
+        byte[] fillFragShader = File.ReadAllBytes(System.IO.Path.Combine(AppContext.BaseDirectory, "fillFrag.spv"));
 
 
         fixed (byte* pFillVertShader = &fillVertShader[0])

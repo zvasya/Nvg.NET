@@ -757,11 +757,12 @@ namespace NvgExample
 
         public Demo(Nvg nvg)
         {
+	        string basePath = AppContext.BaseDirectory;
             _nvg = nvg;
 
             for (uint i = 0; i < 12; i++)
             {
-                string file = "./images/image" + i + ".jpg";
+                string file = Path.Combine(basePath, "images/image" + i + ".jpg");
                 _images[i] = _nvg.CreateImage(file, 0);
                 if (_images[i] == 0)
                 {
@@ -770,25 +771,25 @@ namespace NvgExample
                 }
             }
 
-            _fontIcons = _nvg.CreateFont("icons", "./fonts/entypo.ttf");
+            _fontIcons = _nvg.CreateFont("icons", Path.Combine(basePath, "fonts/entypo.ttf"));
             if (_fontIcons == -1)
             {
                 Console.Error.WriteLine("Could not add font icons.");
                 Environment.Exit(-1);
             }
-            _fontNormal = _nvg.CreateFont("sans", "./fonts/Roboto-Regular.ttf");
+            _fontNormal = _nvg.CreateFont("sans", Path.Combine(basePath, "fonts/Roboto-Regular.ttf"));
             if (_fontIcons == -1)
             {
                 Console.Error.WriteLine("Could not add font regular.");
                 Environment.Exit(-1);
             }
-            _fontBold = _nvg.CreateFont("sans-bold", "./fonts/Roboto-Bold.ttf");
+            _fontBold = _nvg.CreateFont("sans-bold", Path.Combine(basePath, "fonts/Roboto-Bold.ttf"));
             if (_fontIcons == -1)
             {
                 Console.Error.WriteLine("Could not add font bold.");
                 Environment.Exit(-1);
             }
-            _fontEmoji = _nvg.CreateFont("emoji", "./fonts/NotoEmoji-Regular.ttf");
+            _fontEmoji = _nvg.CreateFont("emoji", Path.Combine(basePath, "fonts/NotoEmoji-Regular.ttf"));
             if (_fontIcons == -1)
             {
                 Console.Error.WriteLine("Could not add font emoji.");
