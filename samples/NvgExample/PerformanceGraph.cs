@@ -118,14 +118,14 @@ namespace NvgExample
                 nvg.TextAlign(Align.Right | Align.Top);
                 nvg.FillColour(nvg.Rgba(240, 240, 240, 160));
                 float val = 1.0f / avg;
-                string str = (float.IsInfinity(val) ? "inf" : val) + " FPS";
+                string str = (float.IsInfinity(val) ? "inf" : val.ToString("F4")) + " FPS";
                 _ = nvg.Text(x + w - 3.0f, y + 3.0f, str);
 
                 nvg.FontSize(13.0f);
                 nvg.TextAlign(Align.Right | Align.Baseline);
                 nvg.FillColour(nvg.Rgba(240, 240, 240, 160));
                 val = avg * 1000.0f;
-                str = val + " ms";
+                str = val.ToString("F4") + " ms";
                 _ = nvg.Text(x + w - 3.0f, y + h - 3.0f, str);
             }
             else if (_style == GraphRenderStyle.Percent)
@@ -133,7 +133,7 @@ namespace NvgExample
                 nvg.FontSize(15.0f);
                 nvg.TextAlign(Align.Right | Align.Top);
                 nvg.FillColour(nvg.Rgba(240, 240, 240, 255));
-                string str = avg * 1.0f + "%";
+                string str = (avg * 1.0f).ToString("F2") + "%";
                 _ = nvg.Text(x + w - 3.0f, y + 3.0f, str);
             }
             else if (_style == GraphRenderStyle.Ms)
@@ -141,7 +141,7 @@ namespace NvgExample
                 nvg.FontSize(15.0f);
                 nvg.TextAlign(Align.Right | Align.Top);
                 nvg.FillColour(nvg.Rgba(240, 240, 240, 255));
-                string str = avg * 1000.0f + " ms";
+                string str = (avg * 1000.0f).ToString("F4") + " ms";
                 _ = nvg.Text(x + w - 3.0f, y + 3.0f, str);
             }
         }

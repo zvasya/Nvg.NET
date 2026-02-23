@@ -106,20 +106,10 @@ namespace OpenGL_Example
 
             nvg.BeginFrame(winSize, pxRatio);
 
-            nvg.BeginPath();
-            nvg.MoveTo(250f, 75f);
-            nvg.LineTo(323f, 301f);
-            nvg.LineTo(131f, 161f);
-            nvg.LineTo(369f, 161f);
-            nvg.LineTo(177f, 301f);
-            nvg.ClosePath();
-            nvg.FillColour(Colour.Red);
-            nvg.Fill();
-            
-            /*demo.Render(mx, my, winSize.X, winSize.Y, (float)t, blowup);
+            demo.Render(mx, my, winSize.X, winSize.Y, (float)t, blowup);
 
             frameGraph.Render(5.0f, 5.0f, nvg);
-            cpuGraph.Render(5.0f + 200.0f + 5.0f, 5.0f, nvg);*/
+            cpuGraph.Render(5.0f + 200.0f + 5.0f, 5.0f, nvg);
 
             nvg.EndFrame();
 
