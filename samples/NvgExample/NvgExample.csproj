@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SilkyNvg\SilkyNvg.csproj" />
+    <ProjectReference Include="..\..\src\Nvg\Nvg.csproj" />
   </ItemGroup>
 
   <ItemGroup>

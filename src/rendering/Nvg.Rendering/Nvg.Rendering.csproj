@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version />
+    <RootNamespace>Nvg.Rendering</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\components\Nvg.Tools\Nvg.Tools.csproj" />
+    <ProjectReference Include="..\..\Nvg.Common\Nvg.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Collections.Pooled" Version="1.0.82" />
+  </ItemGroup>
+
+</Project>

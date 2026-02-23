@@ -1,7 +1,7 @@
-﻿using SilkyNvg;
-using SilkyNvg.Graphics;
-using SilkyNvg.Paths;
-using SilkyNvg.Text;
+﻿using NvgNET;
+using NvgNET.Graphics;
+using NvgNET.Paths;
+using NvgNET.Text;
 using System;
 
 namespace NvgExample

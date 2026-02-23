@@ -3,15 +3,15 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using SilkyNvg;
-using SilkyNvg.Rendering.OpenGL;
+using NvgNET;
+using NvgNET.Rendering.OpenGL;
 using StbImageWriteSharp;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using SilkyNvg.Graphics;
-using SilkyNvg.Paths;
+using NvgNET.Graphics;
+using NvgNET.Paths;
 
 namespace OpenGL_Example
 {
@@ -50,7 +50,7 @@ namespace OpenGL_Example
                 premult = !premult;
         }
 
-        private static void MouseMove(IMouse _, System.Numerics.Vector2 mousePosition)
+        private static void MouseMove(IMouse _, Vector2 mousePosition)
         {
             mx = mousePosition.X;
             my = mousePosition.Y;
@@ -148,7 +148,7 @@ namespace OpenGL_Example
             windowOptions.FramesPerSecond = -1;
             windowOptions.ShouldSwapAutomatically = true;
             windowOptions.Size = new Vector2D<int>(1000, 600);
-            windowOptions.Title = "SilkyNvg";
+            windowOptions.Title = "Nvg";
             windowOptions.VSync = false;
             windowOptions.PreferredDepthBufferBits = 24;
             windowOptions.PreferredStencilBufferBits = 8;

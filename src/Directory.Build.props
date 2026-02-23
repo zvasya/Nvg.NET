@@ -5,9 +5,9 @@
         <Authors>Matija Brown</Authors>
         <Description>A port of memononen/nanovg to .NET5.0 primarilly centered around the Silk.NET framework.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/SilkyNvg/SilkyNvg</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Nvg/Nvg</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>NanoVG Graphics UI VectorGraphics VG Silky SilkyNvg SimpleUI</PackageTags>
+        <PackageTags>NanoVG Graphics UI VectorGraphics VG Silky Nvg SimpleUI</PackageTags>
         <PackageReleaseNotes>Fixed package restoration issues.</PackageReleaseNotes>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>

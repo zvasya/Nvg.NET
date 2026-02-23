@@ -10,7 +10,7 @@
     
     <ItemGroup>
         <ProjectReference Include="..\..\samples\NvgExample\NvgExample.csproj" />
-        <ProjectReference Include="..\..\src\rendering\SilkyNvg.Rendering.Vulkan\SilkyNvg.Rendering.Vulkan.csproj" />
+        <ProjectReference Include="..\..\src\rendering\Nvg.Rendering.Vulkan\Nvg.Rendering.Vulkan.csproj" />
     </ItemGroup>
 
     <ItemGroup>

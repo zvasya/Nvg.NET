@@ -1,10 +1,10 @@
-﻿using SilkyNvg;
-using SilkyNvg.Graphics;
-using SilkyNvg.Images;
-using SilkyNvg.Paths;
-using SilkyNvg.Scissoring;
-using SilkyNvg.Text;
-using SilkyNvg.Transforms;
+﻿using NvgNET;
+using NvgNET.Graphics;
+using NvgNET.Images;
+using NvgNET.Paths;
+using NvgNET.Scissoring;
+using NvgNET.Text;
+using NvgNET.Transforms;
 using System;
 using System.Buffers;
 using System.Drawing;

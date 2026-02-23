@@ -4,10 +4,10 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using SilkyNvg;
-using SilkyNvg.Graphics;
-using SilkyNvg.Rendering.OpenGL;
-using SilkyNvg.Text;
+using NvgNET;
+using NvgNET.Graphics;
+using NvgNET.Rendering.OpenGL;
+using NvgNET.Text;
 
 namespace OpenGL_Example
 {
@@ -88,7 +88,7 @@ namespace OpenGL_Example
             windowOptions.FramesPerSecond = -1;
             windowOptions.ShouldSwapAutomatically = true;
             windowOptions.Size = new Vector2D<int>(1000, 600);
-            windowOptions.Title = "SilkyNvg";
+            windowOptions.Title = "Nvg";
             windowOptions.VSync = false;
             windowOptions.PreferredDepthBufferBits = 24;
             windowOptions.PreferredStencilBufferBits = 8;

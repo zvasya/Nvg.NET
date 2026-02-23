@@ -2,11 +2,11 @@
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using SilkyNvg.Graphics;
-using SilkyNvg.Paths;
-using SilkyNvg.Rendering.OpenGL;
+using NvgNET.Graphics;
+using NvgNET.Paths;
+using NvgNET.Rendering.OpenGL;
 
-namespace SilkyNvg.Tests.IncreasingFontSizeTest
+namespace NvgNET.Tests.IncreasingFontSizeTest
 {
     public class Program
     {
@@ -74,7 +74,7 @@ namespace SilkyNvg.Tests.IncreasingFontSizeTest
             windowOptions.FramesPerSecond = -1;
             windowOptions.ShouldSwapAutomatically = true;
             windowOptions.Size = new Vector2D<int>(1000, 600);
-            windowOptions.Title = "SilkyNvg";
+            windowOptions.Title = "Nvg";
             windowOptions.VSync = false;
             windowOptions.PreferredDepthBufferBits = 24;
             windowOptions.PreferredStencilBufferBits = 8;

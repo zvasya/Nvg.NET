@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nvg.Common\Nvg.Common.csproj" />
+    <ProjectReference Include="..\..\Nvg.Core\Nvg.Core.csproj" />
+    <ProjectReference Include="..\Nvg.FontStash\Nvg.FontStash.csproj" />
+    <ProjectReference Include="..\Nvg.Images\Nvg.Images.csproj" />
+    <ProjectReference Include="..\Nvg.Tools\Nvg.Tools.csproj" />
+    <ProjectReference Include="..\Nvg.Transforms\Nvg.Transforms.csproj" />
+  </ItemGroup>
+
+</Project>

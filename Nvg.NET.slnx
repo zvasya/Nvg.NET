@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/examples/">
+    <Project Path="samples/NvgExample/NvgExample.csproj" />
+    <Project Path="samples/OpenGL Example/OpenGL Example.csproj" />
+    <Project Path="samples/Vulkan Example/Vulkan Example.csproj" />
+  </Folder>
+  <Folder Name="/source/">
+    <Project Path="src/Nvg.Common/Nvg.Common.csproj" />
+    <Project Path="src/Nvg.Core/Nvg.Core.csproj" />
+    <Project Path="src/Nvg/Nvg.csproj" />
+  </Folder>
+  <Folder Name="/source/components/">
+    <Project Path="src\components\Nvg.Blending\Nvg.Blending.csproj" />
+    <Project Path="src\components\Nvg.FontStash\Nvg.FontStash.csproj" />
+    <Project Path="src\components\Nvg.Graphics\Nvg.Graphics.csproj" />
+    <Project Path="src\components\Nvg.Images\Nvg.Images.csproj" />
+    <Project Path="src\components\Nvg.Paths\Nvg.Paths.csproj" />
+    <Project Path="src\components\Nvg.Scissoring\Nvg.Scissoring.csproj" />
+    <Project Path="src\components\Nvg.Text\Nvg.Text.csproj" />
+    <Project Path="src\components\Nvg.Tools\Nvg.Tools.csproj" />
+    <Project Path="src\components\Nvg.Transforms\Nvg.Transforms.csproj" />
+  </Folder>
+  <Folder Name="/source/renderers/">
+    <Project Path="src/rendering/Nvg.Rendering.Vulkan/Nvg.Rendering.Vulkan.csproj" />
+    <Project Path="src\rendering\Nvg.Rendering.OpenGL\Nvg.Rendering.OpenGL.csproj" />
+    <Project Path="src\rendering\Nvg.Rendering\Nvg.Rendering.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/graphical/">
+    <Project Path="tests/graphical/AntialiasingTest/AntialiasingTest.csproj" />
+    <Project Path="tests/graphical/FillRuleTest/FillRuleTest.csproj" />
+    <Project Path="tests/graphical/IncreasingFontSizeTest/IncreasingFontSizeTest.csproj" />
+  </Folder>
+</Solution>

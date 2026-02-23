@@ -12,8 +12,8 @@ using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
-using SilkyNvg;
-using SilkyNvg.Rendering.Vulkan;
+using NvgNET;
+using NvgNET.Rendering.Vulkan;
 using VulkanExample2;
 
 using Image = Silk.NET.Vulkan.Image;
@@ -107,7 +107,7 @@ internal class Program
         WindowOptions windowOptions = WindowOptions.DefaultVulkan;
         windowOptions.FramesPerSecond = -1;
         windowOptions.Size = new Vector2D<int>((int)windowExtent.Width, (int)windowExtent.Height);
-        windowOptions.Title = "SilkyNvg + Silk.NET.Vulkan";
+        windowOptions.Title = "Nvg + Silk.NET.Vulkan";
 
         window = Window.Create(windowOptions);
         window.Load += Load;
@@ -639,9 +639,9 @@ internal class Program
 // #if DEBUG && BREAK_ON_ERROR
             if (messageSeverity.HasFlag(DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt))
             {
-                if (System.Diagnostics.Debugger.IsAttached)
+                if (Debugger.IsAttached)
                 {
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
                 }
             }
 // #endif
