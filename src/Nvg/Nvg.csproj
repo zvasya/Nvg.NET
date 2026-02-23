@@ -1,21 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Version />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Version/>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\components\Nvg.Blending\Nvg.Blending.csproj" />
-    <ProjectReference Include="..\components\Nvg.Graphics\Nvg.Graphics.csproj" />
-    <ProjectReference Include="..\components\Nvg.Images\Nvg.Images.csproj" />
-    <ProjectReference Include="..\components\Nvg.Paths\Nvg.Paths.csproj" />
-    <ProjectReference Include="..\components\Nvg.Scissoring\Nvg.Scissoring.csproj" />
-    <ProjectReference Include="..\components\Nvg.Text\Nvg.Text.csproj" />
-    <ProjectReference Include="..\components\Nvg.Tools\Nvg.Tools.csproj" />
-    <ProjectReference Include="..\components\Nvg.Transforms\Nvg.Transforms.csproj" />
-    <ProjectReference Include="..\rendering\Nvg.Rendering\Nvg.Rendering.csproj" />
-    <ProjectReference Include="..\Nvg.Core\Nvg.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\components\Nvg.Blending\Nvg.Blending.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Graphics\Nvg.Graphics.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Images\Nvg.Images.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Paths\Nvg.Paths.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Scissoring\Nvg.Scissoring.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Text\Nvg.Text.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Tools\Nvg.Tools.csproj"/>
+		<ProjectReference Include="..\components\Nvg.Transforms\Nvg.Transforms.csproj"/>
+		<ProjectReference Include="..\rendering\Nvg.Rendering\Nvg.Rendering.csproj"/>
+		<ProjectReference Include="..\Nvg.Core\Nvg.Core.csproj"/>
+	</ItemGroup>
 
 </Project>

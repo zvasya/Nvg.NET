@@ -1,6 +1,6 @@
 using Silk.NET.Vulkan;
 
-namespace VulkanExample2;
+namespace Vulkan_Example;
 
 public class VulkanDevice {
     public PhysicalDevice gpu;

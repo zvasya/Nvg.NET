@@ -1,18 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <RootNamespace>Nvg</RootNamespace>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Version/>
+		<RootNamespace>NvgNET</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Nvg.Common\Nvg.Common.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Nvg.Common\Nvg.Common.csproj"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0"/>
+	</ItemGroup>
 
 </Project>

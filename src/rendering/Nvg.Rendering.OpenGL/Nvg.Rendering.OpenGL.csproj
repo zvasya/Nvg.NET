@@ -1,24 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Version />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Version/>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RootNamespace>NvgNET.Rendering.OpenGL</RootNamespace>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Silk.NET.OpenGL" Version="2.22.0"/>
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Silk.NET.OpenGL" Version="2.22.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Nvg\Nvg.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Nvg\Nvg.csproj"/>
+	</ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 <Solution>
-  <Folder Name="/examples/">
+  <Folder Name="/samples/">
     <Project Path="samples/NvgExample/NvgExample.csproj" />
     <Project Path="samples/OpenGL Example/OpenGL Example.csproj" />
     <Project Path="samples/Vulkan Example/Vulkan Example.csproj" />

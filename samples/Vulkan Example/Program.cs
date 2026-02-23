@@ -14,7 +14,7 @@ using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
 using NvgNET;
 using NvgNET.Rendering.Vulkan;
-using VulkanExample2;
+using Vulkan_Example;
 
 using Image = Silk.NET.Vulkan.Image;
 using Semaphore = Silk.NET.Vulkan.Semaphore;
