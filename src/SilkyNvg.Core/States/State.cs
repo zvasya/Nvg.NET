@@ -94,7 +94,7 @@ namespace SilkyNvg.Core.States
         {
             get
             {
-                State state = new();
+                State state = new State();
                 state.Reset();
                 return state;
             }

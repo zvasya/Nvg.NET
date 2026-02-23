@@ -48,7 +48,7 @@ namespace FontStash.NET
 
         public static void RenderGlyphBitmap(FonsTtImpl font, byte[] texData, int startIndex, int outWidth, int outHeight, int outStride, float scaleX, float scaleY, int glyph)
         {
-            FakePtr<byte> ptr = new(texData, startIndex);
+            FakePtr<byte> ptr = new FakePtr<byte>(texData, startIndex);
             font.font.stbtt_MakeGlyphBitmap(ptr, outWidth, outHeight, outStride, scaleX, scaleY, glyph);
         }
 

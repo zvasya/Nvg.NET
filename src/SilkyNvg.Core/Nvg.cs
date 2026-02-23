@@ -84,7 +84,7 @@ namespace SilkyNvg
         }
 
         /// <inheritdoc cref="BeginFrame(SizeF, float)"/>
-        public void BeginFrame(Vector2 windowSize, float devicePixelRatio) => BeginFrame((SizeF)windowSize, devicePixelRatio);
+        public void BeginFrame(Vector2 windowSize, float devicePixelRatio) => BeginFrame(new SizeF(windowSize.X, windowSize.Y), devicePixelRatio);
 
         /// <inheritdoc cref="BeginFrame(SizeF, float)"/>
         public void BeginFrame(float windowWidth, float windowHeight, float devicePixelRatio) => BeginFrame(new SizeF(windowWidth, windowHeight), devicePixelRatio);
@@ -116,31 +116,31 @@ namespace SilkyNvg
         /// <inheritdoc cref="Colour(byte, byte, byte, byte)"/>
         public Colour Rgba(byte r, byte g, byte b, byte a)
         {
-            return new(r, g, b, a);
+            return new Colour(r, g, b, a);
         }
 
         /// <inheritdoc cref="Colour(float, float, float, float)"/>
         public Colour RgbaF(float r, float g, float b, float a)
         {
-            return new(r, g, b, a);
+            return new Colour(r, g, b, a);
         }
 
         /// <inheritdoc cref="Colour(Colour, byte)"/>
         public Colour TransRgba(Colour c, byte a)
         {
-            return new(c, a);
+            return new Colour(c, a);
         }
 
         /// <inheritdoc cref="Colour(Colour, float)"/>
         public Colour TransRgbaF(Colour c, float a)
         {
-            return new(c, a);
+            return new Colour(c, a);
         }
 
         /// <inheritdoc cref="Colour(Colour, Colour, float)"/>
         public Colour LerpRgba(Colour c0, Colour c1, float u)
         {
-            return new(c0, c1, u);
+            return new Colour(c0, c1, u);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace SilkyNvg
         /// <inheritdoc cref="Colour(float, float, float, byte)"/>
         public Colour Hsla (float h, float s, float l, byte a)
         {
-            return new(h, s, l, a);
+            return new Colour(h, s, l, a);
         }
         #endregion
 

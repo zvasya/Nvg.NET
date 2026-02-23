@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace SilkyNvg.Transforms
 {
@@ -224,7 +225,7 @@ namespace SilkyNvg.Transforms
         /// Converts degrees to radians.
         /// </summary>
         public static float DegToRad(float deg)
-            => float.DegreesToRadians(deg);
+            => (float)(deg * Math.PI / 180.0);
 
         /// <inheritdoc cref="DegToRad(float)"/>
         public static float DegToRad(this Nvg _, float deg)
@@ -234,7 +235,7 @@ namespace SilkyNvg.Transforms
         /// Converts radians to degrees.
         /// </summary>
         public static float RadToDeg(float rad)
-            => float.RadiansToDegrees(rad);
+            => (float)(rad * 180.0 / Math.PI);
 
         /// <inheritdoc cref="RadToDeg(float)"/>
         public static float RadToDeg(this Nvg _, float rad)

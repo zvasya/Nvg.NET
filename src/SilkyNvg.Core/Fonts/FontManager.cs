@@ -31,7 +31,7 @@ namespace SilkyNvg.Core.Fonts
                 _fontImages[i] = 0;
             }
 
-            FonsParams fontParams = new()
+            FonsParams fontParams = new FonsParams()
             {
                 width = INIT_FONTIMAGE_SIZE,
                 height = INIT_FONTIMAGE_SIZE,
@@ -140,7 +140,7 @@ namespace SilkyNvg.Core.Fonts
 
                 if (iSize.Width > MAX_FONTIMAGE_SIZE || iSize.Height > MAX_FONTIMAGE_SIZE)
                 {
-                    iSize = new(MAX_FONTIMAGE_SIZE, MAX_FONTIMAGE_SIZE);
+                    iSize = new Size(MAX_FONTIMAGE_SIZE, MAX_FONTIMAGE_SIZE);
                 }
 
                 _fontImages[_fontImageIdx + 1] = _nvg.renderer.CreateTexture(Texture.Alpha, iSize, 0, null);

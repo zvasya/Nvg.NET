@@ -5,7 +5,7 @@ namespace SilkyNvg.Rendering.OpenGL.Calls
     internal class CallQueue
     {
 
-        private readonly Queue<Call> _calls = new();
+        private readonly Queue<Call> _calls = new Queue<Call>();
 
         public bool HasCalls => _calls.Count > 0;
 

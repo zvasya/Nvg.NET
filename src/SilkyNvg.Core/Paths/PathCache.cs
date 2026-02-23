@@ -48,7 +48,7 @@ namespace SilkyNvg.Core.Paths
 
         public Path AddPath()
         {
-            Path path = new(Winding.Ccw, _nvg.pixelRatio);
+            Path path = new Path(Winding.Ccw, _nvg.pixelRatio);
             _paths.Add(path);
             return path;
         }

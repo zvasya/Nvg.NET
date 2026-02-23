@@ -12,37 +12,37 @@ namespace SilkyNvg
     {
 
         #region Red Colour Constants
-        public static Colour IndianRed { get; } = new(205, 92, 92);
+        public static Colour IndianRed { get; } = new Colour(205, 92, 92);
 
-        public static Colour LightCoral { get; } = new(240, 128, 128);
+        public static Colour LightCoral { get; } = new Colour(240, 128, 128);
 
-        public static Colour Salmon { get; } = new(250, 128, 114);
+        public static Colour Salmon { get; } = new Colour(250, 128, 114);
 
-        public static Colour DarkSalmon { get; } = new(233, 150, 122);
+        public static Colour DarkSalmon { get; } = new Colour(233, 150, 122);
 
-        public static Colour LightSalmon { get; } = new(255, 160, 122);
+        public static Colour LightSalmon { get; } = new Colour(255, 160, 122);
 
-        public static Colour Crimson { get; } = new(220, 20, 60);
+        public static Colour Crimson { get; } = new Colour(220, 20, 60);
 
-        public static Colour Red { get; } = new(255, 0, 0);
+        public static Colour Red { get; } = new Colour(255, 0, 0);
 
-        public static Colour FireBrick { get; } = new(178, 34, 34);
+        public static Colour FireBrick { get; } = new Colour(178, 34, 34);
 
-        public static Colour DarkRed { get; } = new(139, 0, 0);
+        public static Colour DarkRed { get; } = new Colour(139, 0, 0);
         #endregion
 
         #region Pink Colour Constants
-        public static Colour Pink { get; } = new(255, 192, 203);
+        public static Colour Pink { get; } = new Colour(255, 192, 203);
 
-        public static Colour LightPink { get; } = new(255, 182, 193);
+        public static Colour LightPink { get; } = new Colour(255, 182, 193);
 
-        public static Colour HotPink { get; } = new(255, 105, 180);
+        public static Colour HotPink { get; } = new Colour(255, 105, 180);
 
-        public static Colour DeepPink { get; } = new(255, 20, 147);
+        public static Colour DeepPink { get; } = new Colour(255, 20, 147);
 
-        public static Colour MediumVioletRed { get; } = new(199, 21, 133);
+        public static Colour MediumVioletRed { get; } = new Colour(199, 21, 133);
 
-        public static Colour PaleVioletRed { get; } = new(219, 112, 147);
+        public static Colour PaleVioletRed { get; } = new Colour(219, 112, 147);
         #endregion
 
         #region Orange Colour Constants
@@ -122,61 +122,61 @@ namespace SilkyNvg
         #endregion
 
         #region White Colour Constants
-        public static Colour White { get; } = new(255, 255, 255);
+        public static Colour White { get; } = new Colour(255, 255, 255);
 
-        public static Colour Snow { get; } = new(255, 250, 250);
+        public static Colour Snow { get; } = new Colour(255, 250, 250);
 
-        public static Colour Honeydew { get; } = new(240, 255, 240);
+        public static Colour Honeydew { get; } = new Colour(240, 255, 240);
 
-        public static Colour MintCream { get; } = new(245, 255, 250);
+        public static Colour MintCream { get; } = new Colour(245, 255, 250);
 
-        public static Colour Azure { get; } = new(240, 255, 255);
+        public static Colour Azure { get; } = new Colour(240, 255, 255);
 
-        public static Colour AliceBlue { get; } = new(240, 248, 255);
+        public static Colour AliceBlue { get; } = new Colour(240, 248, 255);
 
-        public static Colour GhostWhite { get; } = new(248, 248, 255);
+        public static Colour GhostWhite { get; } = new Colour(248, 248, 255);
 
-        public static Colour WhiteSmoke { get; } = new(245, 245, 245);
+        public static Colour WhiteSmoke { get; } = new Colour(245, 245, 245);
 
-        public static Colour Seashell { get; } = new(255, 245, 238);
+        public static Colour Seashell { get; } = new Colour(255, 245, 238);
 
-        public static Colour Beige { get; } = new(245, 245, 220);
+        public static Colour Beige { get; } = new Colour(245, 245, 220);
 
-        public static Colour OldLace { get; } = new(253, 245, 230);
+        public static Colour OldLace { get; } = new Colour(253, 245, 230);
 
-        public static Colour FloralWhite { get; } = new(255, 250, 240);
+        public static Colour FloralWhite { get; } = new Colour(255, 250, 240);
 
-        public static Colour Ivory { get; } = new(255, 255, 240);
+        public static Colour Ivory { get; } = new Colour(255, 255, 240);
 
-        public static Colour AntiqueWhite { get; } = new(250, 235, 215);
+        public static Colour AntiqueWhite { get; } = new Colour(250, 235, 215);
 
-        public static Colour Linen { get; } = new(250, 240, 230);
+        public static Colour Linen { get; } = new Colour(250, 240, 230);
 
-        public static Colour LavenderBlush { get; } = new(255, 240, 245);
+        public static Colour LavenderBlush { get; } = new Colour(255, 240, 245);
 
-        public static Colour MistyRose { get; } = new(255, 228, 225);
+        public static Colour MistyRose { get; } = new Colour(255, 228, 225);
         #endregion
 
         #region Gray Colour Constants
-        public static Colour Gainsboro { get; } = new(220, 220, 200);
+        public static Colour Gainsboro { get; } = new Colour(220, 220, 200);
 
-        public static Colour LightGray { get; } = new(211, 211, 211);
+        public static Colour LightGray { get; } = new Colour(211, 211, 211);
 
-        public static Colour Silver { get; } = new(192, 192, 192);
+        public static Colour Silver { get; } = new Colour(192, 192, 192);
 
-        public static Colour DarkGray { get; } = new(169, 169, 169);
+        public static Colour DarkGray { get; } = new Colour(169, 169, 169);
 
-        public static Colour Gray { get; } = new(128, 128, 128);
+        public static Colour Gray { get; } = new Colour(128, 128, 128);
 
-        public static Colour DimGray { get; } = new(105, 105, 105);
+        public static Colour DimGray { get; } = new Colour(105, 105, 105);
 
-        public static Colour LightSlateGray { get; } = new(119, 136, 152);
+        public static Colour LightSlateGray { get; } = new Colour(119, 136, 152);
 
-        public static Colour SlateGray { get; } = new(112, 136, 153);
+        public static Colour SlateGray { get; } = new Colour(112, 136, 153);
 
-        public static Colour DarkSlateGray { get; } = new(47, 79, 79);
+        public static Colour DarkSlateGray { get; } = new Colour(47, 79, 79);
 
-        public static Colour Black { get; } = new(0, 0, 0);
+        public static Colour Black { get; } = new Colour(0, 0, 0);
         #endregion
 
         [FieldOffset(0 * sizeof(float))] private readonly float _r;

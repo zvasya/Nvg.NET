@@ -32,7 +32,7 @@ namespace FontStash.NET
                 cglyphs = cglyphs == 0 ? 8 : cglyphs * 2;
                 Array.Resize(ref glyphs, cglyphs);
             }
-            FonsGlyph glyph = new();
+            FonsGlyph glyph = new FonsGlyph();
             glyphs[nglyphs] = glyph;
             nglyphs++;
             return glyphs[nglyphs - 1];

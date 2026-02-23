@@ -248,9 +248,9 @@ namespace SilkyNvg.Paths
             for (int i = 0; i <= ndivs; i++)
             {
                 float alpha = a0 + da * ((float)i / (float)ndivs);
-                Vector2 d = new(MathF.Cos(alpha), MathF.Sin(alpha));
-                Vector2 pos = new(c.X + d.X * r, c.Y + d.Y * r);
-                Vector2 tan = new(-d.Y * r * kappa, d.X * r * kappa);
+                Vector2 d = new Vector2(MathF.Cos(alpha), MathF.Sin(alpha));
+                Vector2 pos = new Vector2(c.X + d.X * r, c.Y + d.Y * r);
+                Vector2 tan = new Vector2(-d.Y * r * kappa, d.X * r * kappa);
 
                 if (i == 0)
                 {
@@ -315,7 +315,7 @@ namespace SilkyNvg.Paths
 
         /// <inheritdoc cref="Rect(Nvg, RectangleF)"/>
         public static void Rect(this Nvg nvg, Vector4 rect)
-            => Rect(nvg, (RectangleF)rect);
+            => Rect(nvg, new RectangleF(rect.X, rect.Y, rect.Z, rect.W));
 
         /// <inheritdoc cref="Rect(Nvg, RectangleF)"/>
         public static void Rect(this Nvg nvg, PointF pos, SizeF size)
@@ -323,7 +323,7 @@ namespace SilkyNvg.Paths
 
         /// <inheritdoc cref="Rect(Nvg, RectangleF)"/>
         public static void Rect(this Nvg nvg, Vector2 pos, Vector2 size)
-            => Rect(nvg, (PointF)pos, (SizeF)size);
+            => Rect(nvg, new PointF(pos.X, pos.Y), new SizeF(size.X, size.Y));
 
         /// <inheritdoc cref="Rect(Nvg, RectangleF)"/>
         public static void Rect(this Nvg nvg, float x, float y, float w, float h)
@@ -339,7 +339,7 @@ namespace SilkyNvg.Paths
 
         /// <inheritdoc cref="RoundedRect(Nvg, RectangleF, float)"/>
         public static void RoundedRect(this Nvg nvg, Vector4 rect, float r)
-            => RoundedRect(nvg, (RectangleF)rect, r);
+            => RoundedRect(nvg, new RectangleF(rect.X, rect.Y, rect.Z, rect.W), r);
 
         /// <inheritdoc cref="RoundedRect(Nvg, RectangleF, float)"/>
         public static void RoundedRect(this Nvg nvg, PointF pos, SizeF size, float r)
@@ -347,7 +347,7 @@ namespace SilkyNvg.Paths
 
         /// <inheritdoc cref="RoundedRect(Nvg, RectangleF, float)"/>
         public static void RoundedRect(this Nvg nvg, Vector2 pos, Vector2 size, float r)
-            => RoundedRect(nvg, (PointF)pos, (SizeF)size, r);
+            => RoundedRect(nvg, new PointF(pos.X, pos.Y), new SizeF(size.X, size.Y), r);
 
         /// <inheritdoc cref="RoundedRect(Nvg, RectangleF, float)"/>
         public static void RoundedRect(this Nvg nvg, float x, float y, float w, float h, float r)
@@ -367,35 +367,35 @@ namespace SilkyNvg.Paths
                 InstructionQueue queue = nvg.instructionQueue;
 
                 float factor = 1 - KAPPA90;
-                Vector2 half = Vector2.Abs((Vector2)rect.Size) * 0.5f;
-                Vector2 rBL = new(MathF.Min(radBottomLeft, half.X) * Maths.Sign(rect.Width),   MathF.Min(radBottomLeft, half.Y) * Maths.Sign(rect.Height));
-                Vector2 rBR = new(MathF.Min(radBottomRight, half.X) * Maths.Sign(rect.Width),  MathF.Min(radBottomRight, half.Y) * Maths.Sign(rect.Height));
-                Vector2 rTR = new(MathF.Min(radTopRight, half.X) * Maths.Sign(rect.Width),     MathF.Min(radTopRight, half.Y) * Maths.Sign(rect.Height));
-                Vector2 rTL = new(MathF.Min(radTopLeft, half.X) * Maths.Sign(rect.Width),      MathF.Min(radTopLeft, half.Y) * Maths.Sign(rect.Height));
-                queue.AddMoveTo(new(rect.Location.X, rect.Location.Y + rTL.Y));
-                queue.AddLineTo(new(rect.Location.X, rect.Location.Y + rect.Height - rBL.Y));
+                Vector2 half = Vector2.Abs(new Vector2(rect.Size.Width, rect.Size.Height)) * 0.5f;
+                Vector2 rBL = new Vector2(MathF.Min(radBottomLeft, half.X) * Maths.Sign(rect.Width),   MathF.Min(radBottomLeft, half.Y) * Maths.Sign(rect.Height));
+                Vector2 rBR = new Vector2(MathF.Min(radBottomRight, half.X) * Maths.Sign(rect.Width),  MathF.Min(radBottomRight, half.Y) * Maths.Sign(rect.Height));
+                Vector2 rTR = new Vector2(MathF.Min(radTopRight, half.X) * Maths.Sign(rect.Width),     MathF.Min(radTopRight, half.Y) * Maths.Sign(rect.Height));
+                Vector2 rTL = new Vector2(MathF.Min(radTopLeft, half.X) * Maths.Sign(rect.Width),      MathF.Min(radTopLeft, half.Y) * Maths.Sign(rect.Height));
+                queue.AddMoveTo(new Vector2(rect.Location.X, rect.Location.Y + rTL.Y));
+                queue.AddLineTo(new Vector2(rect.Location.X, rect.Location.Y + rect.Height - rBL.Y));
                 queue.AddBezierTo(
-                    new(rect.Left,                  rect.Bottom - rBL.Y * factor),
-                    new(rect.Left + rBL.X * factor, rect.Bottom),
-                    new(rect.Left + rBL.X,          rect.Bottom)
+                    new Vector2(rect.Left,                  rect.Bottom - rBL.Y * factor),
+                    new Vector2(rect.Left + rBL.X * factor, rect.Bottom),
+                    new Vector2(rect.Left + rBL.X,          rect.Bottom)
                 );
-                queue.AddLineTo(new(rect.Location.X + rect.Width - rBR.X, rect.Location.Y + rect.Height));
+                queue.AddLineTo(new Vector2(rect.Location.X + rect.Width - rBR.X, rect.Location.Y + rect.Height));
                 queue.AddBezierTo(
-                    new(rect.Right - rBR.X * factor,   rect.Bottom),
-                    new(rect.Right,                    rect.Bottom - rBR.Y * factor),
-                    new(rect.Right,                    rect.Bottom - rBR.Y)
+                    new Vector2(rect.Right - rBR.X * factor,   rect.Bottom),
+                    new Vector2(rect.Right,                    rect.Bottom - rBR.Y * factor),
+                    new Vector2(rect.Right,                    rect.Bottom - rBR.Y)
                 );
-                queue.AddLineTo(new(rect.Location.X + rect.Width, rect.Location.Y + rTR.Y));
+                queue.AddLineTo(new Vector2(rect.Location.X + rect.Width, rect.Location.Y + rTR.Y));
                 queue.AddBezierTo(
-                    new(rect.Right,                    rect.Top + rTR.Y * factor),
-                    new(rect.Right - rTR.X * factor,   rect.Top),
-                    new(rect.Right - rTR.X,            rect.Top)
+                    new Vector2(rect.Right,                    rect.Top + rTR.Y * factor),
+                    new Vector2(rect.Right - rTR.X * factor,   rect.Top),
+                    new Vector2(rect.Right - rTR.X,            rect.Top)
                 );
-                queue.AddLineTo(new(rect.Location.X + rTL.X, rect.Location.Y));
+                queue.AddLineTo(new Vector2(rect.Location.X + rTL.X, rect.Location.Y));
                 queue.AddBezierTo(
-                    new(rect.Left + rTL.X * factor, rect.Top),
-                    new(rect.Left,                  rect.Top + rTL.Y * factor),
-                    new(rect.Left,                  rect.Top + rTL.Y)
+                    new Vector2(rect.Left + rTL.X * factor, rect.Top),
+                    new Vector2(rect.Left,                  rect.Top + rTL.Y * factor),
+                    new Vector2(rect.Left,                  rect.Top + rTL.Y)
                 );
                 queue.AddClose();
             }
@@ -403,7 +403,7 @@ namespace SilkyNvg.Paths
 
         /// <inheritdoc cref="RoundedRectVarying(Nvg, RectangleF, float, float, float, float)"/>
         public static void RoundedRectVarying(this Nvg nvg, Vector4 rect, float radTopLeft, float radTopRight, float radBottomRight, float radBottomLeft)
-            => RoundedRectVarying(nvg, (RectangleF)rect, radTopLeft, radTopRight, radBottomRight, radBottomLeft);
+            => RoundedRectVarying(nvg, new RectangleF(rect.X, rect.Y, rect.Z, rect.W), radTopLeft, radTopRight, radBottomRight, radBottomLeft);
 
         /// <inheritdoc cref="RoundedRectVarying(Nvg, RectangleF, float, float, float, float)"/>
         public static void RoundedRectVarying(this Nvg nvg, PointF pos, SizeF size, float radTopLeft, float radTopRight, float radBottomRight, float radBottomLeft)
@@ -411,7 +411,7 @@ namespace SilkyNvg.Paths
 
         /// <inheritdoc cref="RoundedRectVarying(Nvg, RectangleF, float, float, float, float)"/>
         public static void RoundedRectVarying(this Nvg nvg, Vector2 pos, Vector2 size, float radTopLeft, float radTopRight, float radBottomRight, float radBottomLeft)
-            => RoundedRectVarying(nvg, (PointF)pos, (SizeF)size, radTopLeft, radTopRight, radBottomRight, radBottomLeft);
+            => RoundedRectVarying(nvg, new PointF(pos.X, pos.Y), new SizeF(size.X, size.Y), radTopLeft, radTopRight, radBottomRight, radBottomLeft);
 
         /// <inheritdoc cref="RoundedRectVarying(Nvg, RectangleF, float, float, float, float)"/>
         public static void RoundedRectVarying(this Nvg nvg, float x, float y, float w, float h, float radTopLeft, float radTopRight, float radBottomRight, float radBottomLeft)
@@ -423,23 +423,23 @@ namespace SilkyNvg.Paths
         public static void Ellipse(this Nvg nvg, Vector2 c, float rx, float ry)
         {
             InstructionQueue queue = nvg.instructionQueue;
-            queue.AddMoveTo(new(c.X - rx, c.Y));
+            queue.AddMoveTo(new Vector2(c.X - rx, c.Y));
             queue.AddBezierTo(
-                new(c.X - rx,           c.Y + ry * KAPPA90),
-                new(c.X - rx * KAPPA90, c.Y + ry),
-                new(c.X,                c.Y + ry));
+                new Vector2(c.X - rx,           c.Y + ry * KAPPA90),
+                new Vector2(c.X - rx * KAPPA90, c.Y + ry),
+                new Vector2(c.X,                c.Y + ry));
             queue.AddBezierTo(
-                new(c.X + rx * KAPPA90, c.Y + ry),
-                new(c.X + rx,           c.Y + ry * KAPPA90),
-                new(c.X + rx,           c.Y));
+                new Vector2(c.X + rx * KAPPA90, c.Y + ry),
+                new Vector2(c.X + rx,           c.Y + ry * KAPPA90),
+                new Vector2(c.X + rx,           c.Y));
             queue.AddBezierTo(
-                new(c.X + rx,           c.Y - ry * KAPPA90),
-                new(c.X + rx * KAPPA90, c.Y - ry),
-                new(c.X,                c.Y - ry));
+                new Vector2(c.X + rx,           c.Y - ry * KAPPA90),
+                new Vector2(c.X + rx * KAPPA90, c.Y - ry),
+                new Vector2(c.X,                c.Y - ry));
             queue.AddBezierTo(
-                new(c.X - rx * KAPPA90, c.Y - ry),
-                new(c.X - rx,           c.Y - ry * KAPPA90),
-                new(c.X - rx,           c.Y));
+                new Vector2(c.X - rx * KAPPA90, c.Y - ry),
+                new Vector2(c.X - rx,           c.Y - ry * KAPPA90),
+                new Vector2(c.X - rx,           c.Y));
             queue.AddClose();
         }
 

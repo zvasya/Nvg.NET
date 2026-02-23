@@ -46,14 +46,14 @@ namespace SilkyNvg.Rendering.OpenGL.Shaders
             {
                 _ = Matrix3x2.Invert(scissor.Transform, out invtransform);
                 _scissorMat = new Matrix4x4(invtransform);
-                _scissorExt = (Vector2)scissor.Extent;
+                _scissorExt = new Vector2(scissor.Extent.Width, scissor.Extent.Height);
                 _scissorScale = new Vector2(
                     MathF.Sqrt(scissor.Transform.M11 * scissor.Transform.M11 + scissor.Transform.M21 * scissor.Transform.M21) / fringe,
                     MathF.Sqrt(scissor.Transform.M21 * scissor.Transform.M21 + scissor.Transform.M22 * scissor.Transform.M22) / fringe
                 );
             }
 
-            _extent = (Vector2)paint.Extent;
+            _extent = new Vector2(paint.Extent.Width, paint.Extent.Height);
             _strokeMult = (width * 0.5f + fringe * 0.5f) / fringe;
             _strokeThr = strokeThr;
 

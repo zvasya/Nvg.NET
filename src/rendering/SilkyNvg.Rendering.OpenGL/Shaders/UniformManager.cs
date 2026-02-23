@@ -38,7 +38,7 @@ namespace SilkyNvg.Rendering.OpenGL.Shaders
         public unsafe int AddUniform(FragUniforms uniforms)
         {
             int ret = AllocUniforms(1);
-            ReadOnlySpan<byte> bytes = new(&uniforms, Marshal.SizeOf(typeof(FragUniforms)));
+            ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(&uniforms, Marshal.SizeOf(typeof(FragUniforms)));
             Buffer.BlockCopy(bytes.ToArray(), 0, _uniforms, ret, bytes.Length);
             _count += 1;
             return ret;

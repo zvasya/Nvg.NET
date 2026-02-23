@@ -123,12 +123,12 @@ namespace SilkyNvg.Rendering.OpenGL.Shaders
         public void UploadUniformData()
         {
             BindUniformBuffer();
-            _gl.BufferData(BufferTargetARB.UniformBuffer, (nuint)(UniformManager.CurrentsOffset * FragSize), UniformManager.Uniforms, BufferUsageARB.StreamDraw);
+            _gl.BufferData(BufferTargetARB.UniformBuffer, (UIntPtr)(UniformManager.CurrentsOffset * FragSize), UniformManager.Uniforms, BufferUsageARB.StreamDraw);
         }
 
         public void SetUniforms(int uniformOffset, int image)
         {
-            _gl.BindBufferRange(BufferTargetARB.UniformBuffer, (uint)UniformBindings.FragBinding, _fragBuffer, uniformOffset, (nuint)Marshal.SizeOf(typeof(FragUniforms)));
+            _gl.BindBufferRange(BufferTargetARB.UniformBuffer, (uint)UniformBindings.FragBinding, _fragBuffer, uniformOffset, (UIntPtr)Marshal.SizeOf(typeof(FragUniforms)));
 
             int id = _renderer.DummyTex;
             if (image != 0)

@@ -21,11 +21,11 @@ namespace SilkyNvg.Rendering
 
         public float V { readonly get => _v; internal set => _v = value; }
 
-        public Vector2 Pos => new(_x, _y);
+        public Vector2 Pos => new Vector2(_x, _y);
 
-        public Vector2 TexPos => new(_u, _v);
+        public Vector2 TexPos => new Vector2(_u, _v);
 
-        public Vector4 Data => new(_x, _y, _u, _v);
+        public Vector4 Data => new Vector4(_x, _y, _u, _v);
 
         public Vertex(float x, float y, float u, float v)
         {

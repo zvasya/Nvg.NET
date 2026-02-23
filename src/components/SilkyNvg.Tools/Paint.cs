@@ -38,7 +38,7 @@ namespace SilkyNvg
         }
 
         public Paint(Matrix3x2 transform, Vector2 extent, float radius, float feather, Colour innerColour, Colour outerColour, int image)
-            : this(transform, (SizeF)extent, radius, feather, innerColour, outerColour, image) { }
+            : this(transform, new SizeF(extent.X, extent.Y), radius, feather, innerColour, outerColour, image) { }
 
         internal Paint(Colour colour)
             : this(Matrix3x2.Identity, SizeF.Empty, default, default, colour, colour, default) { }
@@ -83,14 +83,14 @@ namespace SilkyNvg
                 delta = Vector2.UnitY;
             }
 
-            Matrix3x2 transform = new
+            Matrix3x2 transform = new Matrix3x2
             (
                 delta.Y, -delta.X,
                 delta.X, delta.Y,
                 s.X - delta.X * large, s.Y - delta.Y * large
             );
 
-            SizeF extent = new(large, large + d * 0.5f);
+            SizeF extent = new SizeF(large, large + d * 0.5f);
 
             return new Paint(transform, extent, 0.0f, MathF.Max(1.0f, d), icol, ocol, default);
         }
@@ -126,7 +126,8 @@ namespace SilkyNvg
         /// <returns></returns>
         public static Paint BoxGradient(RectangleF box, float r, float f, Colour icol, Colour ocol)
         {
-            Matrix3x2 transform = Matrix3x2.CreateTranslation((Vector2)(box.Location + box.Size / 2.0f));
+            var boxLocation = box.Location + box.Size / 2.0f;
+            Matrix3x2 transform = Matrix3x2.CreateTranslation(new Vector2(boxLocation.X, boxLocation.Y));
             SizeF extent = box.Size * 0.5f;
 
             return new Paint(transform, extent, r, MathF.Max(1.0f, f), icol, ocol, default);
@@ -134,7 +135,7 @@ namespace SilkyNvg
 
         /// <inheritdoc cref="BoxGradient(RectangleF, float, float, Colour, Colour)"/>
         public static Paint BoxGradient(Vector4 box, float r, float f, Colour icol, Colour ocol)
-            => BoxGradient((RectangleF)box, r, f, icol, ocol);
+            => BoxGradient(new RectangleF(box.X, box.Y, box.Z, box.W), r, f, icol, ocol);
 
         /// <summary>
         /// Creates and returns a linear gradient. Box gradient is a feathered rounded rectangle, it is useful for rendering
@@ -153,7 +154,7 @@ namespace SilkyNvg
 
         /// <inheritdoc cref="BoxGradient(PointF, SizeF, float, float, Colour, Colour)"/>
         public static Paint BoxGradient(Vector2 pos, Vector2 size, float r, float f, Colour icol, Colour ocol)
-            => BoxGradient((PointF)pos, (SizeF)size, r, f, icol, ocol);
+            => BoxGradient(new PointF(pos.X, pos.Y), new SizeF(size.X, size.Y), r, f, icol, ocol);
 
         /// <summary>
         /// Creates and returns a linear gradient. Box gradient is a feathered rounded rectangle, it is useful for rendering
@@ -188,7 +189,7 @@ namespace SilkyNvg
             float f = (outr - inr);
 
             Matrix3x2 transform = Matrix3x2.CreateTranslation(c);
-            SizeF extent = new(r, r);
+            SizeF extent = new SizeF(r, r);
 
             return new Paint(transform, extent, r, MathF.Max(1.0f, f), icol, ocol, default);
         }
@@ -232,7 +233,7 @@ namespace SilkyNvg
 
         /// <inheritdoc cref="ImagePattern(RectangleF, float, int, float)"/>
         public static Paint ImagePattern(Vector4 bounds, float angle, int image, float alpha)
-            => ImagePattern((RectangleF)bounds, angle, image, alpha);
+            => ImagePattern( new RectangleF(bounds.X, bounds.Y,bounds.Z, bounds.W), angle, image, alpha);
 
         /// <summary>
         /// Creates and returns an image pattern.
@@ -247,7 +248,7 @@ namespace SilkyNvg
 
         /// <inheritdoc cref="ImagePattern(PointF, SizeF, float, int, float)"/>
         public static Paint ImagePattern(Vector2 origin, Vector2 size, float angle, int image, float alpha)
-            => ImagePattern((PointF)origin, (SizeF)size, angle, image, alpha);
+            => ImagePattern(new PointF(origin.X, origin.Y), new SizeF(size.X, size.Y), angle, image, alpha);
 
         /// <summary>
         /// Creates and returns an image pattern.

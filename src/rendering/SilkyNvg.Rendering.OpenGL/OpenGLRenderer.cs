@@ -100,8 +100,8 @@ namespace SilkyNvg.Rendering.OpenGL
             CheckError("uniform locations");
             Shader.GetUniforms();
 
-            _vao = new(Gl);
-            _vao.Vbo = new(Gl);
+            _vao = new VAO(Gl);
+            _vao.Vbo = new VBO(Gl);
 
             Filter = new StateFilter();
 
@@ -198,7 +198,7 @@ namespace SilkyNvg.Rendering.OpenGL
                 _vao.Vbo.Update(_vertexCollection.Vertices);
 
                 Shader.LoadInt(UniformLoc.Tex, 0);
-                Shader.LoadVector(UniformLoc.ViewSize, (Vector2)_size);
+                Shader.LoadVector(UniformLoc.ViewSize, new Vector2(_size.Width, _size.Height));
 
                 Shader.BindUniformBuffer();
                 _callQueue.Run();
@@ -240,7 +240,7 @@ namespace SilkyNvg.Rendering.OpenGL
                 offset += path.Stroke.Count;
             }
 
-            FragUniforms uniforms = new(paint, scissor, fringe, fringe, -1.0f, this);
+            FragUniforms uniforms = new FragUniforms(paint, scissor, fringe, fringe, -1.0f, this);
             Call call;
             if ((paths.Count == 1) && paths[0].Convex) // Convex
             {
@@ -254,7 +254,7 @@ namespace SilkyNvg.Rendering.OpenGL
                 _vertexCollection.AddVertex(new Vertex(bounds.Left, bounds.Bottom, 0.5f, 1.0f));
                 _vertexCollection.AddVertex(new Vertex(bounds.Left, bounds.Top, 0.5f, 1.0f));
 
-                FragUniforms stencilUniforms = new(-1.0f, Shaders.ShaderType.Simple);
+                FragUniforms stencilUniforms = new FragUniforms(-1.0f, Shaders.ShaderType.Simple);
                 int uniformOffset = Shader.UniformManager.AddUniform(stencilUniforms);
                 _ = Shader.UniformManager.AddUniform(uniforms);
 
@@ -282,11 +282,11 @@ namespace SilkyNvg.Rendering.OpenGL
                 offset += paths[i].Stroke.Count;
             }
 
-            FragUniforms uniforms = new(paint, scissor, strokeWidth, fringe, -1.0f, this);
+            FragUniforms uniforms = new FragUniforms(paint, scissor, strokeWidth, fringe, -1.0f, this);
             Call call;
             if (StencilStrokes)
             {
-                FragUniforms stencilUniforms = new(paint, scissor, strokeWidth, fringe, 1.0f - 0.5f / 255.0f, this);
+                FragUniforms stencilUniforms = new FragUniforms(paint, scissor, strokeWidth, fringe, 1.0f - 0.5f / 255.0f, this);
                 int uniformOffset = Shader.UniformManager.AddUniform(uniforms);
                 _ = Shader.UniformManager.AddUniform(stencilUniforms);
 
@@ -305,7 +305,7 @@ namespace SilkyNvg.Rendering.OpenGL
             int offset = _vertexCollection.CurrentsOffset;
             _vertexCollection.AddVertices(vertices);
 
-            FragUniforms uniforms = new(paint, scissor, fringe, this);
+            FragUniforms uniforms = new FragUniforms(paint, scissor, fringe, this);
             int uniformOffset = Shader.UniformManager.AddUniform(uniforms);
             Call call = new TrianglesCall(paint.Image, new Blend(compositeOperation, this), offset, (uint)vertices.Count, uniformOffset, this);
             _callQueue.Add(call);

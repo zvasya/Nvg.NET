@@ -71,7 +71,7 @@ namespace SilkyNvg.Rendering
                 }
             }
 
-            Point point = new(position, flags);
+            Point point = new Point(position, flags);
             _points.Add(point);
         }
 
@@ -138,7 +138,7 @@ namespace SilkyNvg.Rendering
         private void ButtCapStart(Point p, Vector2 delta, float w, float d, float aa, float u0, float u1)
         {
             Vector2 pPos = p.Position - delta * d;
-            Vector2 dl = new(delta.Y, -delta.X);
+            Vector2 dl = new Vector2(delta.Y, -delta.X);
             _stroke.Add(new Vertex(pPos + (dl * w) - (delta * aa), u0, 0.0f));
             _stroke.Add(new Vertex(pPos - (dl * w) - (delta * aa), u1, 0.0f));
             _stroke.Add(new Vertex(pPos + (dl * w), u0, 1.0f));
@@ -148,7 +148,7 @@ namespace SilkyNvg.Rendering
         private void ButtCapEnd(Point p, Vector2 delta, float w, float d, float aa, float u0, float u1)
         {
             Vector2 pPos = p.Position + delta * d;
-            Vector2 dl = new(delta.Y, -delta.X);
+            Vector2 dl = new Vector2(delta.Y, -delta.X);
             _stroke.Add(new Vertex(pPos + (dl * w), u0, 1.0f));
             _stroke.Add(new Vertex(pPos - (dl * w), u1, 1.0f));
             _stroke.Add(new Vertex(pPos + (dl * w) + (delta * aa), u0, 0.0f));
@@ -158,7 +158,7 @@ namespace SilkyNvg.Rendering
         private void RoundCapStart(Point p, Vector2 delta, float w, uint ncap, float u0, float u1)
         {
             Vector2 pPos = p.Position;
-            Vector2 dl = new(delta.Y, -delta.X);
+            Vector2 dl = new Vector2(delta.Y, -delta.X);
             for (int i = 0; i < ncap; i++)
             {
                 float a = i / (float)(ncap - 1) * MathF.PI;
@@ -174,7 +174,7 @@ namespace SilkyNvg.Rendering
         private void RoundCapEnd(Point p, Vector2 delta, float w, uint ncap, float u0, float u1)
         {
             Vector2 pPos = p.Position;
-            Vector2 dl = new(delta.Y, -delta.X);
+            Vector2 dl = new Vector2(delta.Y, -delta.X);
             _stroke.Add(new Vertex(pPos + (dl * w), u0, 1.0f));
             _stroke.Add(new Vertex(pPos - (dl * w), u1, 1.0f));
             for (int i = 0; i < ncap; i++)
@@ -189,8 +189,8 @@ namespace SilkyNvg.Rendering
 
         private void BevelJoin(Point p0, Point p1, float lw, float rw, float lu, float ru)
         {
-            Vector2 dl0 = new(p0.Determinant.Y, -p0.Determinant.X);
-            Vector2 dl1 = new(p1.Determinant.Y, -p1.Determinant.X);
+            Vector2 dl0 = new Vector2(p0.Determinant.Y, -p0.Determinant.X);
+            Vector2 dl1 = new Vector2(p1.Determinant.Y, -p1.Determinant.X);
 
             p1.JoinBevel(lw, rw, lu, ru, dl0, dl1, p0, _stroke);
         }
@@ -247,7 +247,7 @@ namespace SilkyNvg.Rendering
                 {
                     ButtCapStart(p0, d, w, -aa * 0.5f, aa, u0, u1);
                 }
-                else if (lineCap is LineCap.Butt or LineCap.Square)
+                else if (lineCap is  LineCap.Square)
                 {
                     ButtCapStart(p0, d, w, w - aa, aa, u0, u1);
                 }
@@ -298,7 +298,7 @@ namespace SilkyNvg.Rendering
                 {
                     ButtCapEnd(p1, d, w, -aa * 0.5f, aa, u0, u1);
                 }
-                else if (lineCap is LineCap.Butt or LineCap.Square)
+                else if (lineCap is LineCap.Square)
                 {
                     ButtCapEnd(p1, d, w, w - aa, aa, u0, u1);
                 }

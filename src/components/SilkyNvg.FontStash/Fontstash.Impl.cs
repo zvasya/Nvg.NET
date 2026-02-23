@@ -44,7 +44,7 @@ namespace FontStash.NET
                 _cfonts = _cfonts == 0 ? 8 : _cfonts * 2;
                 Array.Resize(ref _fonts, _cfonts);
             }
-            FonsFont font = new();
+            FonsFont font = new FonsFont();
             font.glyphs = new FonsGlyph[INIT_GLYPHS];
             font.cglyphs = INIT_GLYPHS;
             font.nglyphs = 0;
@@ -239,7 +239,7 @@ namespace FontStash.NET
 
         private FonsQuad GetQuad(FonsFont font, int prevGlyphIndex, FonsGlyph glyph, float scale, float spacing, ref float x, ref float y)
         {
-            FonsQuad q = new();
+            FonsQuad q = new FonsQuad();
 
             if (prevGlyphIndex != INVALID)
             {

@@ -1,9 +1,10 @@
-namespace SilkyNvg.Paths;
-
-public enum FillRule
+namespace SilkyNvg.Paths
 {
-    
-    EvenOdd,
-    Nonzero
-    
+	public enum FillRule
+	{
+
+		EvenOdd,
+		Nonzero
+
+	}
 }

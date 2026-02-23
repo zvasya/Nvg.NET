@@ -198,7 +198,7 @@ namespace SilkyNvg.Text
             Fontstash fons = nvg.fontManager.Fontstash;
             State state = nvg.stateStack.CurrentState;
 
-            FonsQuad q = new();
+            FonsQuad q = new FonsQuad();
 
             float scale = nvg.fontManager.GetFontScale() * nvg.pixelRatio.DevicePxRatio;
             float invscale = 1.0f / scale;
@@ -215,7 +215,7 @@ namespace SilkyNvg.Text
             fons.SetAlign((int)state.TextAlign);
             fons.SetFont(state.FontId);
 
-            List<Vertex> vertices = new();
+            List<Vertex> vertices = new List<Vertex>();
             Span<Vector2> c = stackalloc Vector2[4];
             fons.TextIterInit(out FonsTextIter iter, pos.X * scale, pos.Y * scale, @string, end, FonsGlyphBitmap.Requiered);
             FonsTextIter prevIter = iter;
@@ -370,7 +370,7 @@ namespace SilkyNvg.Text
         /// <returns>The horizontal advance of the measured text (i.e. where the next character should be drawn).</returns>
         public static float TextBounds(this Nvg nvg, Vector2 pos, string @string, string end, out RectangleF bounds)
         {
-            bounds = new RectangleF((PointF)pos, SizeF.Empty);
+            bounds = new RectangleF(new PointF(pos.X, pos.Y), SizeF.Empty);
 
             Fontstash fons = nvg.fontManager.Fontstash;
             State state = nvg.stateStack.CurrentState;
@@ -528,7 +528,7 @@ namespace SilkyNvg.Text
             State state = nvg.stateStack.CurrentState;
             float scale = nvg.fontManager.GetFontScale() * nvg.pixelRatio.DevicePxRatio;
             float invscale = 1.0f / scale;
-            FonsQuad q = new();
+            FonsQuad q = new FonsQuad();
             int npos = 0;
 
             if (state.FontId == Fontstash.INVALID)
@@ -619,7 +619,7 @@ namespace SilkyNvg.Text
             State state = nvg.stateStack.CurrentState;
             float scale = nvg.fontManager.GetFontScale() * nvg.pixelRatio.DevicePxRatio;
             float invscale = 1.0f / scale;
-            FonsQuad q = new();
+            FonsQuad q = new FonsQuad();
             int nrows = 0;
             float rowStartX = 0.0f;
             float rowWidth = 0.0f;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Numerics;
+using SilkyNvg.Rendering;
 
 namespace SilkyNvg.Scissoring
 {
@@ -17,22 +18,22 @@ namespace SilkyNvg.Scissoring
         /// </summary>
         public static void Scissor(this Nvg nvg, RectangleF rect)
         {
-            Vector2 pos = (Vector2)rect.Location;
-            Vector2 size = (Vector2)rect.Size;
+            Vector2 pos = new Vector2(rect.Location.X, rect.Location.Y);
+            Vector2 size = new Vector2(rect.Size.Width, rect.Size.Height);
 
             size = Vector2.Max(Vector2.Zero, size);
 
             Matrix3x2 transform = Matrix3x2.CreateTranslation(pos + size * 0.5f);
 
-            nvg.stateStack.CurrentState.Scissor = new(
+            nvg.stateStack.CurrentState.Scissor = new Scissor(
                 Transforms.NvgTransforms.Multiply(transform, nvg.stateStack.CurrentState.Transform),
-                (SizeF)(size * 0.5f)
+                new SizeF(size.X * 0.5f, size.Y * 0.5f)
             );
         }
 
         /// <inheritdoc cref="Scissor(Nvg, RectangleF)"/>
         public static void Scissor(this Nvg nvg, Vector4 rect)
-            => Scissor(nvg, (RectangleF)rect);
+            => Scissor(nvg, new RectangleF(rect.X, rect.Y, rect.Z, rect.W));
 
         /// <inheritdoc cref="Scissor(Nvg, RectangleF)"/>
         public static void Scissor(this Nvg nvg, PointF pos, SizeF size)
@@ -40,7 +41,7 @@ namespace SilkyNvg.Scissoring
 
         /// <inheritdoc cref="Scissor(Nvg, RectangleF)"/>
         public static void Scissor(this Nvg nvg, Vector2 pos, Vector2 size)
-            => Scissor(nvg, (PointF)pos, (SizeF)size);
+            => Scissor(nvg, new PointF(pos.X, pos.Y), new SizeF(size.X, size.Y));
 
         /// <inheritdoc cref="Scissor(Nvg, RectangleF)"/>
         public static void Scissor(this Nvg nvg, float x, float y, float width, float height)
@@ -68,7 +69,7 @@ namespace SilkyNvg.Scissoring
             _ = Transforms.NvgTransforms.Inverse(out Matrix3x2 invtransform, nvg.stateStack.CurrentState.Transform);
             ptransform = Transforms.NvgTransforms.Multiply(ptransform, invtransform);
 
-            Vector2 te = new(
+            Vector2 te = new Vector2(
                 e.Width * MathF.Abs(ptransform.M11) + e.Height * MathF.Abs(ptransform.M21),
                 e.Width * MathF.Abs(ptransform.M12) + e.Height * MathF.Abs(ptransform.M22)
             );
@@ -80,7 +81,7 @@ namespace SilkyNvg.Scissoring
 
         /// <inheritdoc cref="IntersectScissor(Nvg, RectangleF)"/>
         public static void IntersectScissor(this Nvg nvg, Vector4 rect)
-            => IntersectScissor(nvg, (RectangleF)rect);
+            => IntersectScissor(nvg, new RectangleF(rect.X, rect.Y, rect.Z, rect.W));
 
         /// <inheritdoc cref="IntersectScissor(Nvg, RectangleF)"/>
         public static void IntersectScissor(this Nvg nvg, PointF pos, SizeF size)
@@ -88,7 +89,7 @@ namespace SilkyNvg.Scissoring
 
         /// <inheritdoc cref="IntersectScissor(Nvg, RectangleF)"/>
         public static void IntersectScissor(this Nvg nvg, Vector2 pos, Vector2 size)
-            => IntersectScissor(nvg, (PointF)pos, (SizeF)size);
+            => IntersectScissor(nvg, new PointF(pos.X, pos.Y), new SizeF(size.X, size.Y));
 
         /// <inheritdoc cref="IntersectScissor(Nvg, RectangleF)"/>
         public static void IntersectScissor(this Nvg nvg, float x, float y, float w, float h)
@@ -99,7 +100,7 @@ namespace SilkyNvg.Scissoring
         /// </summary>
         public static void ResetScissor(this Nvg nvg)
         {
-            nvg.stateStack.CurrentState.Scissor = new(new SizeF(-1.0f, -1.0f));
+            nvg.stateStack.CurrentState.Scissor = new Scissor(new SizeF(-1.0f, -1.0f));
         }
 
     }

@@ -13,7 +13,7 @@ namespace SilkyNvg.Images
 
         /// <inheritdoc cref="Paint.ImagePattern(RectangleF, float, int, float)"/>
         public static Paint ImagePattern(this Nvg _, Vector4 bounds, float angle, int image, float alpha)
-            => Paint.ImagePattern((RectangleF)bounds, angle, image, alpha);
+            => Paint.ImagePattern(new RectangleF(bounds.X, bounds.Y, bounds.Z, bounds.W), angle, image, alpha);
 
         /// <inheritdoc cref="Paint.ImagePattern(PointF, SizeF, float, int, float)"/>
         public static Paint ImagePattern(this Nvg _, PointF pos, SizeF size, float angle, int image, float alpha)
