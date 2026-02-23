@@ -1,4 +1,6 @@
-﻿namespace SilkyNvg.Text
+﻿using System;
+
+namespace SilkyNvg.Text
 {
     public struct TextRow
     {
@@ -6,17 +8,17 @@
         /// <summary>
         /// Input text from where row starts.
         /// </summary>
-        public string Start { get; internal set; }
+        public ReadOnlyMemory<Char> Start { get; internal set; }
 
         /// <summary>
         /// The input text where the row ends (one past the last character).
         /// </summary>
-        public string End { get; internal set; }
+        public ReadOnlyMemory<Char> End { get; internal set; }
 
         /// <summary>
         /// Beginning, and rest of, the next row.
         /// </summary>
-        public string Next { get; internal set; }
+        public ReadOnlyMemory<Char> Next { get; internal set; }
 
         /// <summary>
         /// Logical width of the row.

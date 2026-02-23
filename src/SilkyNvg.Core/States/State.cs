@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace SilkyNvg.Core.States
 {
-    internal class State
+    internal struct State
     {
 
         public CompositeOperationState CompositeOperation { get; set; }
@@ -99,11 +99,5 @@ namespace SilkyNvg.Core.States
                 return state;
             }
         }
-
-        public State Clone()
-        {
-            return (State)MemberwiseClone();
-        }
-
     }
 }

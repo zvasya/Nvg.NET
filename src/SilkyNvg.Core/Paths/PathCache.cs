@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
+using Collections.Pooled;
+
 namespace SilkyNvg.Core.Paths
 {
     internal class PathCache
@@ -13,12 +15,14 @@ namespace SilkyNvg.Core.Paths
 
         private const uint INIT_PATHS_SIZE = 16;
 
-        private readonly IList<Path> _paths = new List<Path>((int)INIT_PATHS_SIZE);
+        private static readonly PooledList<Path> Cache = new PooledList<Path>((int)INIT_PATHS_SIZE);
+        private readonly PooledList<Path> _paths = new PooledList<Path>((int)INIT_PATHS_SIZE);
         private readonly Nvg _nvg;
 
         private RectangleF _bounds;
 
-        public IReadOnlyList<Path> Paths => (IReadOnlyList<Path>)_paths;
+        public int Count => _paths.Count;
+        public ReadOnlySpan<Path> Paths => _paths.Span;
 
         public RectangleF Bounds => _bounds;
 
@@ -31,7 +35,12 @@ namespace SilkyNvg.Core.Paths
 
         public void Clear()
         {
-            _paths.Clear();
+	        foreach (var path in _paths)
+	        {
+		        path.Dispose();
+	        }
+	        Cache.AddRange(_paths);
+	        _paths.Clear();
         }
 
         public Path LastPath
@@ -48,7 +57,16 @@ namespace SilkyNvg.Core.Paths
 
         public Path AddPath()
         {
-            Path path = new Path(Winding.Ccw, _nvg.pixelRatio);
+            Path path;
+            if (Cache.Count > 0)
+            {
+	            path = Cache[^1];
+	            path.Winding = Winding.Ccw;
+	            Cache.RemoveAt(Cache.Count - 1);
+            }
+            else
+				path = new Path(Winding.Ccw, _nvg.pixelRatio);
+            
             _paths.Add(path);
             return path;
         }
@@ -130,22 +148,20 @@ namespace SilkyNvg.Core.Paths
             {
                 Path path = _paths[i];
                 Console.WriteLine(" - Path " + i);
-                if (path.Fill.Count > 0)
+                if (path.FillCount > 0)
                 {
-                    Console.WriteLine("     - fill: " + path.Fill.Count);
-                    IEnumerator<Vertex> enumerator = path.Fill.GetEnumerator();
-                    while (enumerator.MoveNext())
+                    Console.WriteLine("     - fill: " + path.FillCount);
+                    foreach (Vertex vertex in path.Fill)
                     {
-                        Console.WriteLine("         " + enumerator.Current.X + "    " + enumerator.Current.Y);
+	                    Console.WriteLine("         " + vertex.X + "    " + vertex.Y);
                     }
                 }
-                if (path.Stroke.Count > 0)
+                if (path.StrokeCount > 0)
                 {
-                    Console.WriteLine("     - stroke: " + path.Stroke.Count);
-                    IEnumerator<Vertex> enumerator = path.Stroke.GetEnumerator();
-                    while (enumerator.MoveNext())
+                    Console.WriteLine("     - stroke: " + path.StrokeCount);
+                    foreach (Vertex vertex in path.Stroke)
                     {
-                        Console.WriteLine("         " + enumerator.Current.X + "    " + enumerator.Current.Y);
+                        Console.WriteLine("         " + vertex.X + "    " + vertex.Y);
                     }
                 }
             }

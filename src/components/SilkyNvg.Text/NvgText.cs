@@ -4,9 +4,11 @@ using SilkyNvg.Core.States;
 using SilkyNvg.Rendering;
 using SilkyNvg.Transforms;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using Collections.Pooled;
 
 namespace SilkyNvg.Text
 {
@@ -189,11 +191,16 @@ namespace SilkyNvg.Text
             Fontstash fons = nvg.fontManager.Fontstash;
             nvg.stateStack.CurrentState.FontId = fons.GetFontByName(font);
         }
+        
+        static readonly PooledList<Vertex> Vertices = new PooledList<Vertex>(16);
 
         /// <summary>
         /// Draws text string at specified location. Only the sub-string up to the end is drawn.
         /// </summary>
-        public static float Text(this Nvg nvg, Vector2 pos, string @string, string end)
+        public static float Text(this Nvg nvg, Vector2 pos, string @string, string end) =>
+	        Text(nvg, pos, @string.AsMemory(), end.AsMemory());
+
+        public static float Text(this Nvg nvg, Vector2 pos, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end)
         {
             Fontstash fons = nvg.fontManager.Fontstash;
             State state = nvg.stateStack.CurrentState;
@@ -215,7 +222,7 @@ namespace SilkyNvg.Text
             fons.SetAlign((int)state.TextAlign);
             fons.SetFont(state.FontId);
 
-            List<Vertex> vertices = new List<Vertex>();
+            PooledList<Vertex> vertices = Vertices;
             Span<Vector2> c = stackalloc Vector2[4];
             fons.TextIterInit(out FonsTextIter iter, pos.X * scale, pos.Y * scale, @string, end, FonsGlyphBitmap.Requiered);
             FonsTextIter prevIter = iter;
@@ -226,7 +233,7 @@ namespace SilkyNvg.Text
                 {
                     if (vertices.Count != 0)
                     {
-                        nvg.fontManager.RenderText(vertices);
+                        nvg.fontManager.RenderText(vertices.Span);
                         vertices.Clear();
                     }
                     if (!nvg.fontManager.AllocTextAtlas()) // no memory
@@ -266,31 +273,44 @@ namespace SilkyNvg.Text
             }
 
             nvg.fontManager.FlushTextTexture();
-            nvg.fontManager.RenderText(vertices);
-
+            nvg.fontManager.RenderText(vertices.Span);
+			vertices.Clear();
+			
             return iter.nextx / scale;
         }
 
         /// <inheritdoc cref="Text(Nvg, Vector2, string, string)"/>
         public static float Text(this Nvg nvg, PointF pos, string @string, string end)
+	        => Text(nvg, pos, @string.AsMemory(), end.AsMemory());
+
+        public static float Text(this Nvg nvg, PointF pos, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end)
             => Text(nvg, pos.ToVector2(), @string, end);
 
         /// <inheritdoc cref="Text(Nvg, Vector2, string, string)"/>
         public static float Text(this Nvg nvg, float x, float y, string @string, string end)
+	        => Text(nvg, x, y, @string.AsMemory(), end.AsMemory());
+
+        public static float Text(this Nvg nvg, float x, float y, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end)
             => Text(nvg, new Vector2(x, y), @string, end);
 
         /// <summary>
         /// Draws text string at specified location.
         /// </summary>
         public static float Text(this Nvg nvg, Vector2 pos, string @string)
+	        => Text(nvg, pos, @string.AsMemory());
+        public static float Text(this Nvg nvg, Vector2 pos, ReadOnlyMemory<Char> @string)
             => Text(nvg, pos, @string, null);
 
         /// <inheritdoc cref="Text(Nvg, Vector2, string)"/>
         public static float Text(this Nvg nvg, PointF pos, string @string)
+	        => Text( nvg,  pos,@string.AsMemory());
+        public static float Text(this Nvg nvg, PointF pos, ReadOnlyMemory<Char> @string)
             => Text(nvg, pos.ToVector2(), @string, null);
 
         /// <inheritdoc cref="Text(Nvg, Vector2, string)"/>
-        public static float Text(this Nvg nvg, float x, float y, string @string)
+        public static float Text(this Nvg nvg, float x, float y, string @string) 
+	        => Text(nvg, x, y, @string.AsMemory());
+        public static float Text(this Nvg nvg, float x, float y, ReadOnlyMemory<Char> @string)
             => Text(nvg, new Vector2(x, y), @string, null);
 
         /// <summary>
@@ -299,6 +319,8 @@ namespace SilkyNvg.Text
         /// Words longer than the max width are slit at nearest character (i.e. no hyphenation).
         /// </summary>
         public static void TextBox(this Nvg nvg, Vector2 pos, float breakRowWidth, string @string, string end)
+	        => TextBox(nvg, pos, breakRowWidth, @string.AsMemory(), end.AsMemory());
+        public static void TextBox(this Nvg nvg, Vector2 pos, float breakRowWidth, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end)
         {
             State state = nvg.stateStack.CurrentState;
             int rowCount;
@@ -314,8 +336,12 @@ namespace SilkyNvg.Text
             TextMetrics(nvg, out _, out _, out float lineh);
 
             state.TextAlign = Align.Left | vAlign;
+            
+            int maxRow = 2;
+            var textRows = ArrayPool<TextRow>.Shared.Rent(maxRow);
+            Span<TextRow> rows = textRows.AsSpan(0,maxRow);
 
-            while ((rowCount = TextBreakLines(nvg, @string, end, breakRowWidth, out TextRow[] rows, 2)) != 0)
+            while ((rowCount = TextBreakLines(nvg, @string, end, breakRowWidth, rows)) != 0)
             {
                 for (int i = 0; i < rowCount; i++)
                 {
@@ -335,16 +361,23 @@ namespace SilkyNvg.Text
                 }
                 @string = rows[rowCount - 1].Next;
             }
+            ArrayPool<TextRow>.Shared.Return(textRows);
 
             state.TextAlign = oldAlign;
         }
 
         /// <inheritdoc cref="TextBox(Nvg, Vector2, float, string, string)"/>
         public static void TextBox(this Nvg nvg, PointF pos, float breakRowWidth, string @string, string end)
+	        => TextBox(nvg, pos, breakRowWidth, @string.AsMemory(), end.AsMemory());
+        
+        public static void TextBox(this Nvg nvg, PointF pos, float breakRowWidth, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end)
             => TextBox(nvg, pos.ToVector2(), breakRowWidth, @string, end);
 
         /// <inheritdoc cref="TextBox(Nvg, Vector2, float, string, string)"/>
         public static void TextBox(this Nvg nvg, float x, float y, float breakRowWidth, string @string, string end)
+	        =>   TextBox( nvg,  x,  y,  breakRowWidth,@string.AsMemory(),end.AsMemory());
+        
+        public static void TextBox(this Nvg nvg, float x, float y, float breakRowWidth, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end)
             => TextBox(nvg, new Vector2(x, y), breakRowWidth, @string, end);
 
         /// <summary>
@@ -352,14 +385,23 @@ namespace SilkyNvg.Text
         /// the text is split at word boundries or when new-line characters are encountered. Words longer than the max width are slit at nearest character (i.e. no hyphenation).
         /// </summary>
         public static void TextBox(this Nvg nvg, Vector2 pos, float breakRowWidth, string @string)
+	        => TextBox(nvg, pos, breakRowWidth, @string.AsMemory());
+        
+        public static void TextBox(this Nvg nvg, Vector2 pos, float breakRowWidth, ReadOnlyMemory<Char> @string)
             => TextBox(nvg, pos, breakRowWidth, @string, null);
 
         /// <inheritdoc cref="TextBox(Nvg, Vector2, float, string)"/>
         public static void TextBox(this Nvg nvg, PointF pos, float breakRowWidth, string @string)
+	        => TextBox(nvg, pos, breakRowWidth, @string.AsMemory());
+        
+        public static void TextBox(this Nvg nvg, PointF pos, float breakRowWidth, ReadOnlyMemory<Char> @string)
             => TextBox(nvg, pos.ToVector2(), breakRowWidth, @string, null);
 
         /// <inheritdoc cref="TextBox(Nvg, Vector2, float, string)"/>
         public static void TextBox(this Nvg nvg, float x, float y, float breakRowWidth, string @string)
+			=> TextBox(nvg, x, y, breakRowWidth, @string.AsMemory());
+        
+        public static void TextBox(this Nvg nvg, float x, float y, float breakRowWidth, ReadOnlyMemory<Char> @string)
             => TextBox(nvg, new Vector2(x, y), breakRowWidth, @string, null);
 
         /// <summary>
@@ -369,6 +411,9 @@ namespace SilkyNvg.Text
         /// <param name="bounds">Contains the bounds of the text when returned.</param>
         /// <returns>The horizontal advance of the measured text (i.e. where the next character should be drawn).</returns>
         public static float TextBounds(this Nvg nvg, Vector2 pos, string @string, string end, out RectangleF bounds)
+	        => TextBounds(nvg, pos, @string.AsMemory(), end.AsMemory(), out bounds);
+        
+        public static float TextBounds(this Nvg nvg, Vector2 pos, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out RectangleF bounds)
         {
             bounds = new RectangleF(new PointF(pos.X, pos.Y), SizeF.Empty);
 
@@ -388,14 +433,14 @@ namespace SilkyNvg.Text
             fons.SetAlign((int)state.TextAlign);
             fons.SetFont(state.FontId);
 
-            float width = fons.TextBounds(pos.X * scale, pos.Y * scale, @string, end, out float[] bs);
+            float width = fons.TextBounds(pos.X * scale, pos.Y * scale, @string, end, out Vector4 bs);
             if (bs != null)
             {
-                fons.LineBounds(pos.Y * scale, out bs[1], out bs[3]);
+                fons.LineBounds(pos.Y * scale, out bs.Y, out bs.W);
                 bounds = new RectangleF
                 (
-                    new PointF(bs[0] * invscale, bs[1] * invscale),
-                    new SizeF((bs[2] - bs[0]) * invscale, (bs[3] - bs[1]) * invscale)
+                    new PointF(bs.X * invscale, bs.Y * invscale),
+                    new SizeF((bs.Z - bs.X) * invscale, (bs.W - bs.Y) * invscale)
                 );
             }
 
@@ -404,22 +449,37 @@ namespace SilkyNvg.Text
 
         /// <inheritdoc cref="TextBounds(Nvg, Vector2, string, string, out RectangleF)"/>
         public static float TextBounds(this Nvg nvg, PointF pos, string @string, string end, out RectangleF bounds)
+	        => TextBounds(nvg, pos, @string.AsMemory(), end.AsMemory(), out bounds);
+        
+        public static float TextBounds(this Nvg nvg, PointF pos, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out RectangleF bounds)
             => TextBounds(nvg, pos.ToVector2(), @string, end, out bounds);
 
         /// <inheritdoc cref="TextBounds(Nvg, Vector2, string, string, out RectangleF)"/>
         public static float TextBounds(this Nvg nvg, float x, float y, string @string, string end, out RectangleF bounds)
+	        => TextBounds(nvg, x, y, @string.AsMemory(), end.AsMemory(), out bounds);
+
+        public static float TextBounds(this Nvg nvg, float x, float y, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out RectangleF bounds)
             => TextBounds(nvg, new Vector2(x, y), @string, end, out bounds);
 
         /// <inheritdoc cref="TextBounds(Nvg, Vector2, string, string, out RectangleF)"/>
         public static float TextBounds(this Nvg nvg, Vector2 pos, string @string, out RectangleF bounds)
+	        => TextBounds(nvg, pos, @string.AsMemory(), out bounds);
+
+        public static float TextBounds(this Nvg nvg, Vector2 pos, ReadOnlyMemory<Char> @string, out RectangleF bounds)
             => TextBounds(nvg, pos, @string, null, out bounds);
 
         /// <inheritdoc cref="TextBounds(Nvg, Vector2, string, string, out RectangleF)"/>
         public static float TextBounds(this Nvg nvg, PointF pos, string @string, out RectangleF bounds)
+	        =>    TextBounds( nvg,  pos,@string.AsMemory(), out  bounds);
+
+        public static float TextBounds(this Nvg nvg, PointF pos, ReadOnlyMemory<Char> @string, out RectangleF bounds)
             => TextBounds(nvg, pos, @string, null, out bounds);
 
         /// <inheritdoc cref="TextBounds(Nvg, Vector2, string, string, out RectangleF)"/>
         public static float TextBounds(this Nvg nvg, float x, float y, string @string, out RectangleF bounds)
+	        => TextBounds(nvg, x, y, @string.AsMemory(), out bounds);
+
+        public static float TextBounds(this Nvg nvg, float x, float y, ReadOnlyMemory<Char> @string, out RectangleF bounds)
             => TextBounds(nvg, new Vector2(x, y), @string, null, out bounds);
 
         /// <summary>
@@ -428,6 +488,9 @@ namespace SilkyNvg.Text
         /// </summary>
         /// <param name="bounds">Contains the bounds box of the multi-text when returned.</param>
         public static void TextBoxBounds(this Nvg nvg, Vector2 pos, float breakRowWidth, string @string, string end, out RectangleF bounds)
+	        => TextBoxBounds(nvg, pos, breakRowWidth, @string.AsMemory(), end.AsMemory(), out bounds);
+        
+        public static void TextBoxBounds(this Nvg nvg, Vector2 pos, float breakRowWidth, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out RectangleF bounds)
         {
             Fontstash fons = nvg.fontManager.Fontstash;
             State state = nvg.stateStack.CurrentState;
@@ -459,10 +522,14 @@ namespace SilkyNvg.Text
             fons.LineBounds(0, out float rMinY, out float rMaxY);
             rMinY *= invscale;
             rMaxY *= invscale;
-
-            while ((nrows = TextBreakLines(nvg, @string, end, breakRowWidth, out TextRow[] rows, 2)) != 0)
+            
+            int maxRow = 2;
+            var textRows = ArrayPool<TextRow>.Shared.Rent(maxRow);
+            Span<TextRow> rows = textRows.AsSpan(0,maxRow);
+            
+            while ((nrows = TextBreakLines(nvg, @string, end, breakRowWidth, rows)) != 0)
             {
-                for (uint i = 0; i < nrows; i++)
+                for (int i = 0; i < nrows; i++)
                 {
                     float rMinX, rMaxX;
                     float dx = 0.0f;
@@ -490,6 +557,8 @@ namespace SilkyNvg.Text
                 }
                 @string = rows[nrows - 1].Next;
             }
+            
+            ArrayPool<TextRow>.Shared.Return(textRows);
 
             state.TextAlign = oldAlign;
 
@@ -498,22 +567,37 @@ namespace SilkyNvg.Text
 
         /// <inheritdoc cref="TextBoxBounds(Nvg, Vector2, float, string, string, out RectangleF)"/>
         public static void TextBoxBounds(this Nvg nvg, PointF pos, float breakRowWidth, string @string, string end, out RectangleF bounds)
+	        => TextBoxBounds(nvg, pos, breakRowWidth, @string.AsMemory(), end.AsMemory(), out bounds);
+        
+        public static void TextBoxBounds(this Nvg nvg, PointF pos, float breakRowWidth, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out RectangleF bounds)
             => TextBoxBounds(nvg, pos.ToVector2(), breakRowWidth, @string, end, out bounds);
 
         /// <inheritdoc cref="TextBoxBounds(Nvg, Vector2, float, string, string, out RectangleF)"/>
         public static void TextBoxBounds(this Nvg nvg, float x, float y, float breakRowWidth, string @string, string end, out RectangleF bounds)
+	        => TextBoxBounds(nvg, x, y, breakRowWidth, @string.AsMemory(), end.AsMemory(), out bounds);
+        
+        public static void TextBoxBounds(this Nvg nvg, float x, float y, float breakRowWidth, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out RectangleF bounds)
             => TextBoxBounds(nvg, new Vector2(x, y), breakRowWidth, @string, end, out bounds);
 
         /// <inheritdoc cref="TextBoxBounds(Nvg, Vector2, float, string, string, out RectangleF)"/>
         public static void TextBoxBounds(this Nvg nvg, Vector2 pos, float breakRowWidth, string @string, out RectangleF bounds)
+	        => TextBoxBounds(nvg, pos, breakRowWidth, @string.AsMemory(), out bounds);
+        
+        public static void TextBoxBounds(this Nvg nvg, Vector2 pos, float breakRowWidth, ReadOnlyMemory<Char> @string, out RectangleF bounds)
             => TextBoxBounds(nvg, pos, breakRowWidth, @string, null, out bounds);
 
         /// <inheritdoc cref="TextBoxBounds(Nvg, Vector2, float, string, string, out RectangleF)"/>
         public static void TextBoxBounds(this Nvg nvg, PointF pos, float breakRowWidth, string @string, out RectangleF bounds)
+	        => TextBoxBounds(nvg, pos, breakRowWidth, @string.AsMemory(), out bounds);
+        
+        public static void TextBoxBounds(this Nvg nvg, PointF pos, float breakRowWidth, ReadOnlyMemory<Char> @string, out RectangleF bounds)
             => TextBoxBounds(nvg, pos, breakRowWidth, @string, null, out bounds);
 
         /// <inheritdoc cref="TextBoxBounds(Nvg, Vector2, float, string, string, out RectangleF)"/>
-        public static void TextBoxBounds(this Nvg nvg, float x, float y, float breakRowWidth, string @string, out RectangleF bounds)
+        public static void TextBoxBounds(this Nvg nvg, float x, float y, float breakRowWidth, string @string, out RectangleF bounds) 
+	        => TextBoxBounds(nvg, x, y, breakRowWidth, @string.AsMemory(), out bounds);
+        
+        public static void TextBoxBounds(this Nvg nvg, float x, float y, float breakRowWidth, ReadOnlyMemory<Char> @string, out RectangleF bounds)
             => TextBoxBounds(nvg, new Vector2(x, y), breakRowWidth, @string, null, out bounds);
 
         /// <summary>
@@ -521,6 +605,9 @@ namespace SilkyNvg.Text
         /// Measures values are returned in local coordinate space.
         /// </summary>
         public static int TextGlyphPositions(this Nvg nvg, Vector2 pos, string @string, string end, out GlyphPosition[] positions, int maxRows)
+	        => TextGlyphPositions(nvg, pos, @string.AsMemory(), end.AsMemory(), out positions, maxRows);
+        
+        public static int TextGlyphPositions(this Nvg nvg, Vector2 pos, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out GlyphPosition[] positions, int maxRows)
         {
             positions = new GlyphPosition[maxRows];
 
@@ -536,7 +623,7 @@ namespace SilkyNvg.Text
                 return 0;
             }
 
-            if (@string == end)
+            if (StringUtils.Equal(@string, end))
             {
                 return 0;
             }
@@ -569,10 +656,16 @@ namespace SilkyNvg.Text
 
         /// <inheritdoc cref="TextGlyphPositions(Nvg, Vector2, string, string, out GlyphPosition[], int)"/>
         public static int TextGlyphPositions(this Nvg nvg, PointF pos, string @string, string end, out GlyphPosition[] positions, int maxRows)
+	        =>    TextGlyphPositions( nvg, pos,@string.AsMemory(),end.AsMemory(), out positions,  maxRows);
+        
+        public static int TextGlyphPositions(this Nvg nvg, PointF pos, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out GlyphPosition[] positions, int maxRows)
             => TextGlyphPositions(nvg, pos.ToVector2(), @string, end, out positions, maxRows);
 
         /// <inheritdoc cref="TextGlyphPositions(Nvg, Vector2, string, string, out GlyphPosition[], int)"/>
         public static int TextGlyphPositions(this Nvg nvg, float x, float y, string @string, string end, out GlyphPosition[] positions, int maxRows)
+	        => TextGlyphPositions(nvg, x, y, @string.AsMemory(), end.AsMemory(), out positions, maxRows);
+        
+        public static int TextGlyphPositions(this Nvg nvg, float x, float y, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, out GlyphPosition[] positions, int maxRows)
             => TextGlyphPositions(nvg, new Vector2(x, y), @string, end, out positions, maxRows);
 
 
@@ -610,9 +703,16 @@ namespace SilkyNvg.Text
         /// White space is stripped at the beginning of the rows, the text is split at word boundaries or when new-line characters are encountered.<br/>
         /// Words longer than the max width are slit at nearest character (i.e. no hyphenation).
         /// </summary>
-        public static int TextBreakLines(this Nvg nvg, string @string, string end, float breakRowWidth, out TextRow[] rows, int maxRows)
+        public static int TextBreakLines(this Nvg nvg, string @string, string end, float breakRowWidth, out TextRow[] rows, int maxRows) 
+	        => TextBreakLines(nvg, @string.AsMemory(), end.AsMemory(), breakRowWidth, rows = new TextRow[maxRows]);
+
+        public static int TextBreakLines(this Nvg nvg, string @string, string end, float breakRowWidth, Span<TextRow> rows) 
+	        => TextBreakLines(nvg, @string.AsMemory(), end.AsMemory(), breakRowWidth, rows);
+        
+        public static int TextBreakLines(this Nvg nvg, ReadOnlyMemory<Char> @string, ReadOnlyMemory<Char> end, float breakRowWidth, Span<TextRow> rows)
         {
-            rows = new TextRow[maxRows];
+	        rows.Clear();
+	        int maxRows = rows.Length;
 
             Fontstash fons = nvg.fontManager.Fontstash;
 
@@ -625,12 +725,12 @@ namespace SilkyNvg.Text
             float rowWidth = 0.0f;
             float rowMinX = 0.0f;
             float rowMaxX = 0.0f;
-            string rowStart = null;
-            string rowEnd = null;
-            string wordStart = null;
+            ReadOnlyMemory<Char>? rowStart = null;
+            ReadOnlyMemory<Char>? rowEnd = null;
+            ReadOnlyMemory<Char>? wordStart = null;
             float wordStartX = 0.0f;
             float wordMinX = 0.0f;
-            string breakEnd = null;
+            ReadOnlyMemory<Char>? breakEnd = null;
             float breakWidth = 0.0f;
             float breakMaxX = 0.0f;
             CodepointType type, pType = CodepointType.Space;
@@ -646,7 +746,7 @@ namespace SilkyNvg.Text
                 return 0;
             }
 
-            if (@string == end || @string.Length == 0)
+            if (StringUtils.Equal(@string, end) || @string.Length == 0)
             {
                 return 0;
             }
@@ -778,11 +878,11 @@ namespace SilkyNvg.Text
 
                         if ((type == CodepointType.Char || type == CodepointType.CJKChar) && nextWidth > breakRowWidth)
                         {
-                            if (breakEnd == rowStart)
+                            if (StringUtils.Equal(breakEnd ?? new ReadOnlyMemory<char>(), rowStart ?? new ReadOnlyMemory<char>()))
                             {
                                 rows[nrows++] = new TextRow()
                                 {
-                                    Start = rowStart,
+                                    Start = rowStart ?? new ReadOnlyMemory<char>(),
                                     End = iter.str,
                                     Width = rowWidth * invscale,
                                     MinX = rowMinX * invscale,
@@ -809,12 +909,12 @@ namespace SilkyNvg.Text
                             {
                                 rows[nrows++] = new TextRow()
                                 {
-                                    Start = rowStart,
-                                    End = breakEnd,
+                                    Start = rowStart ?? new ReadOnlyMemory<char>(),
+                                    End = breakEnd ?? new ReadOnlyMemory<char>(),
                                     Width = breakWidth * invscale,
                                     MinX = rowMinX * invscale,
                                     MaxX = breakMaxX * invscale,
-                                    Next = wordStart
+                                    Next = wordStart ?? new ReadOnlyMemory<char>()
                                 };
 
                                 if (nrows >= maxRows)
@@ -845,8 +945,8 @@ namespace SilkyNvg.Text
             {
                 rows[nrows++] = new TextRow()
                 {
-                    Start = rowStart,
-                    End = rowEnd,
+                    Start = rowStart ?? new ReadOnlyMemory<char>(),
+                    End = rowEnd ?? new ReadOnlyMemory<char>(),
                     Width = rowWidth * invscale,
                     MinX = rowMinX * invscale,
                     MaxX = rowMaxX * invscale,
@@ -862,8 +962,12 @@ namespace SilkyNvg.Text
         /// White space is stripped at the beginning of the rows, the text is split at word boundaries or when new-line characters are encountered.<br/>
         /// Words longer than the max width are slit at nearest character (i.e. no hyphenation).
         /// </summary>
+        
         public static int TextBreakLines(this Nvg nvg, string @string, float breakRowWidth, out TextRow[] rows, int maxRows)
-            => TextBreakLines(nvg, @string, null, breakRowWidth, out rows, maxRows);
+	        => TextBreakLines(nvg, @string.AsMemory(), null, breakRowWidth, rows = new TextRow[maxRows]);
+
+        public static int TextBreakLines(this Nvg nvg, string @string, float breakRowWidth, Span<TextRow> rows)
+            => TextBreakLines(nvg, @string.AsMemory(), null, breakRowWidth, rows);
 
     }
 }

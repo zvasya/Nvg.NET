@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace SilkyNvg.Core.Instructions
 {
-    internal class MoveToInstruction : IInstruction
+    internal struct MoveToInstruction
     {
         private readonly Vector2 _position;
         private readonly PathCache _pathCache;
@@ -15,10 +15,10 @@ namespace SilkyNvg.Core.Instructions
             _pathCache = pathCache;
         }
 
-        public void BuildPaths()
+        public static void BuildPaths(MoveToInstruction  moveToInstruction)
         {
-            _pathCache.AddPath();
-            _pathCache.LastPath.AddPoint(_position, PointFlags.Corner);
+	        moveToInstruction._pathCache.AddPath();
+	        moveToInstruction._pathCache.LastPath.AddPoint(moveToInstruction._position, PointFlags.Corner);
         }
     }
 }

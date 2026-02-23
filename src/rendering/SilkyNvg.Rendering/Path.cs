@@ -6,18 +6,19 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
 
+using Collections.Pooled;
+
 namespace SilkyNvg.Rendering
 {
-    public sealed class Path
+    public sealed class Path : IDisposable
     {
+        private const int INIT_POINTS_SIZE = 128;
+        private const int INIT_VERTS_SIZE = 256;
 
-        private const uint INIT_POINTS_SIZE = 128;
-        private const uint INIT_VERTS_SIZE = 256;
+        private readonly PooledList<Point> _points = new PooledList<Point>(INIT_POINTS_SIZE);
 
-        private readonly IList<Point> _points = new List<Point>((int)INIT_POINTS_SIZE);
-
-        private readonly IList<Vertex> _fill = new List<Vertex>((int)INIT_VERTS_SIZE);
-        private readonly IList<Vertex> _stroke = new List<Vertex>((int)INIT_VERTS_SIZE);
+        private readonly PooledList<Vertex> _fill = new PooledList<Vertex>(INIT_VERTS_SIZE);
+        private readonly PooledList<Vertex> _stroke = new PooledList<Vertex>(INIT_VERTS_SIZE);
 
         private readonly PixelRatio _pixelRatio;
         private uint _bevelCount;
@@ -27,9 +28,11 @@ namespace SilkyNvg.Rendering
 
         public uint BevelCount => _bevelCount;
 
-        public IList<Vertex> Fill => _fill;
+        public int FillCount => _fill.Count;
+        public ReadOnlySpan<Vertex> Fill => _fill.Span;
 
-        public IList<Vertex> Stroke => _stroke;
+        public int StrokeCount => _stroke.Count;
+        public ReadOnlySpan<Vertex> Stroke => _stroke.Span;
 
         public bool Convex { get; private set; }
 
@@ -63,7 +66,7 @@ namespace SilkyNvg.Rendering
         {
             if (_points.Count > 0)
             {
-                Point pt = _points[^1];
+                ref Point pt = ref _points.Span[^1];
                 if (Point.Equals(pt.Position, position, _pixelRatio.DistTol))
                 {
                     pt.Flags |= flags;
@@ -72,6 +75,7 @@ namespace SilkyNvg.Rendering
             }
 
             Point point = new Point(position, flags);
+            
             _points.Add(point);
         }
 
@@ -82,12 +86,11 @@ namespace SilkyNvg.Rendering
 
         private void PolyReverse()
         {
-            int i = 0, j = _points.Count - 1;
+	        var pooledList = _points.Span;
+	        int i = 0, j = pooledList.Length - 1;
             while (i < j)
             {
-                Point tmp = _points[i];
-                _points[i] = _points[j];
-                _points[j] = tmp;
+                (pooledList[i], pooledList[j]) = (pooledList[j], pooledList[i]);
                 i++;
                 j--;
             }
@@ -95,47 +98,48 @@ namespace SilkyNvg.Rendering
 
         internal void Flatten()
         {
-            Point p0 = _points[^1];
-            Point p1 = _points[0];
+            ref Point p0 = ref _points.Span[^1];
+            ref Point p1 = ref _points.Span[0];
             if (Point.Equals(p0, p1, _pixelRatio.DistTol))
             {
                 _points.RemoveAt(_points.Count - 1);
-                p0 = _points[^1];
+                p0 = ref _points.Span[^1];
                 Close();
             }
 
             if (_points.Count > 2)
             {
-                float area = Point.PolyArea(_points);
+                float area = Point.PolyArea(_points.Span);
                 if (Winding == Winding.Ccw && area < 0.0f)
                 {
                     PolyReverse();
-                    p0 = _points[^1];
+                    p0 = ref _points.Span[^1];
                 }
                 if (Winding == Winding.Cw && area > 0.0f)
                 {
                     PolyReverse();
-                    p0 = _points[^1];
+                    p0 = ref _points.Span[^1];
                 }
             }
 
-            foreach (Point point in _points)
+	        Span<Point> pointsSpan = _points.Span;
+            for (int i = 0; i < pointsSpan.Length; i++)
             {
-                p1 = point;
-                p0.SetDeterminant(p1);
+	            ref Point point = ref pointsSpan[i];
+	            p0.SetDeterminant(point);
 
-                float xMin = MathF.Min(_bounds.Left, p0.Position.X);
-                float yMin = MathF.Min(_bounds.Top, p0.Position.Y);
-                float xMax = MathF.Max(_bounds.Right, p0.Position.X);
-                float yMax = MathF.Max(_bounds.Bottom, p0.Position.Y);
+	            float xMin = MathF.Min(_bounds.Left, p0.Position.X);
+	            float yMin = MathF.Min(_bounds.Top, p0.Position.Y);
+	            float xMax = MathF.Max(_bounds.Right, p0.Position.X);
+	            float yMax = MathF.Max(_bounds.Bottom, p0.Position.Y);
 
-                _bounds = RectangleF.FromLTRB(xMin, yMin, xMax, yMax);
+	            _bounds = RectangleF.FromLTRB(xMin, yMin, xMax, yMax);
 
-                p0 = p1;
+	            p0 = ref point;
             }
         }
 
-        private void ButtCapStart(Point p, Vector2 delta, float w, float d, float aa, float u0, float u1)
+        private void ButtCapStart(in Point p, Vector2 delta, float w, float d, float aa, float u0, float u1)
         {
             Vector2 pPos = p.Position - delta * d;
             Vector2 dl = new Vector2(delta.Y, -delta.X);
@@ -145,7 +149,7 @@ namespace SilkyNvg.Rendering
             _stroke.Add(new Vertex(pPos - (dl * w), u1, 1.0f));
         }
 
-        private void ButtCapEnd(Point p, Vector2 delta, float w, float d, float aa, float u0, float u1)
+        private void ButtCapEnd(in Point p, Vector2 delta, float w, float d, float aa, float u0, float u1)
         {
             Vector2 pPos = p.Position + delta * d;
             Vector2 dl = new Vector2(delta.Y, -delta.X);
@@ -155,7 +159,7 @@ namespace SilkyNvg.Rendering
             _stroke.Add(new Vertex(pPos - (dl * w) + (delta * aa), u1, 0.0f));
         }
 
-        private void RoundCapStart(Point p, Vector2 delta, float w, uint ncap, float u0, float u1)
+        private void RoundCapStart(in Point p, Vector2 delta, float w, uint ncap, float u0, float u1)
         {
             Vector2 pPos = p.Position;
             Vector2 dl = new Vector2(delta.Y, -delta.X);
@@ -171,7 +175,7 @@ namespace SilkyNvg.Rendering
             _stroke.Add(new Vertex(pPos - (dl * w), u1, 1.0f));
         }
 
-        private void RoundCapEnd(Point p, Vector2 delta, float w, uint ncap, float u0, float u1)
+        private void RoundCapEnd(in Point p, Vector2 delta, float w, uint ncap, float u0, float u1)
         {
             Vector2 pPos = p.Position;
             Vector2 dl = new Vector2(delta.Y, -delta.X);
@@ -187,7 +191,7 @@ namespace SilkyNvg.Rendering
             }
         }
 
-        private void BevelJoin(Point p0, Point p1, float lw, float rw, float lu, float ru)
+        private void BevelJoin(ref Point p0, ref Point p1, float lw, float rw, float lu, float ru)
         {
             Vector2 dl0 = new Vector2(p0.Determinant.Y, -p0.Determinant.X);
             Vector2 dl1 = new Vector2(p1.Determinant.Y, -p1.Determinant.X);
@@ -197,19 +201,20 @@ namespace SilkyNvg.Rendering
 
         internal void CalculateJoins(float iw, LineCap lineJoin, float miterLimit)
         {
-            Point p0 = _points[^1];
-            Point p1 = _points[0];
+	        Span<Point> pointsSpan = _points.Span;
+	        ref Point p0 = ref pointsSpan[^1];
+            ref Point p1 = ref pointsSpan[0];
             uint nleft = 0;
 
             _bevelCount = 0;
 
-            foreach (Point point in _points)
+            for (int i = 0; i < pointsSpan.Length; i++)
             {
-                p1 = point;
-                bool bevelOrRound = (lineJoin == LineCap.Bevel) || (lineJoin == LineCap.Round);
-                p1.Join(p0, iw, bevelOrRound, miterLimit, ref nleft, ref _bevelCount);
+	            p1 = ref pointsSpan[i];
+	            bool bevelOrRound = (lineJoin == LineCap.Bevel) || (lineJoin == LineCap.Round);
+	            p1.Join(ref p0, iw, bevelOrRound, miterLimit, ref nleft, ref _bevelCount);
 
-                p0 = p1;
+	            p0 = ref p1;
             }
 
             Convex = nleft == _points.Count;
@@ -217,6 +222,7 @@ namespace SilkyNvg.Rendering
 
         internal void ExpandStroke(float aa, float u0, float u1, float w, LineCap lineCap, LineCap lineJoin, uint ncap)
         {
+	        var pooledList = _points.Span;
             _fill.Clear();
 
             bool loop = Closed;
@@ -226,17 +232,17 @@ namespace SilkyNvg.Rendering
             int s, e;
             if (loop)
             {
-                p0 = _points[^1];
-                p1 = _points[0];
+                p0 = pooledList[^1];
+                p1 = pooledList[0];
                 s = 0;
-                e = _points.Count;
+                e = pooledList.Length;
             }
             else
             {
-                p0 = _points[0];
-                p1 = _points[1];
+                p0 = pooledList[0];
+                p1 = pooledList[1];
                 s = 1;
-                e = _points.Count - 1;
+                e = pooledList.Length - 1;
             }
 
             if (!loop)
@@ -247,7 +253,7 @@ namespace SilkyNvg.Rendering
                 {
                     ButtCapStart(p0, d, w, -aa * 0.5f, aa, u0, u1);
                 }
-                else if (lineCap is  LineCap.Square)
+                else if (lineCap is LineCap.Square)
                 {
                     ButtCapStart(p0, d, w, w - aa, aa, u0, u1);
                 }
@@ -259,7 +265,7 @@ namespace SilkyNvg.Rendering
 
             for (int i = s; i < e; i++)
             {
-                p1 = _points[i];
+	            p1 = pooledList[i];
 
                 if (p1.Flags.HasFlag(PointFlags.Bevel) || p1.Flags.HasFlag(PointFlags.Innerbevel))
                 {
@@ -282,7 +288,7 @@ namespace SilkyNvg.Rendering
             }
             if (s > 0)
             {
-                p1 = _points[e];
+                p1 = pooledList[e];
             }
 
             if (loop)
@@ -311,10 +317,11 @@ namespace SilkyNvg.Rendering
 
         private void ExpandFillFill(float woff, bool fringe)
         {
-            Point p0 = _points[^1];
-            Point p1 = _points[0];
+	        var points =  _points.Span;
+            Point p0 = points[^1];
+            Point p1 = points[0];
 
-            foreach (Point point in _points)
+            foreach (Point point in points)
             {
                 p1 = point;
                 Point.Vertex(p0, p1, woff, _fill);
@@ -337,23 +344,25 @@ namespace SilkyNvg.Rendering
                     lu = 0.5f;
                 }
 
-                Point p0 = _points[^1];
-                Point p1 = _points[0];
+	            Span<Point> pointsSpan = _points.Span;
+                ref Point p0 = ref pointsSpan[^1];
+                ref Point p1 = ref pointsSpan[0];
 
-                foreach (Point point in _points)
+                for (int i = 0; i < pointsSpan.Length; i++)
                 {
-                    p1 = point;
-                    if ((p1.Flags & (PointFlags.Bevel | PointFlags.Innerbevel)) != 0)
-                    {
-                        BevelJoin(p0, p1, lw, rw, lu, ru);
-                    }
-                    else
-                    {
-                        _stroke.Add(new Vertex(p1.Position + (p1.MatrixDeterminant * lw), lu, 1.0f));
-                        _stroke.Add(new Vertex(p1.Position - (p1.MatrixDeterminant * rw), ru, 1.0f));
-                    }
+	                ref Point point = ref pointsSpan[i];
+	                p1 = ref point;
+	                if ((p1.Flags & (PointFlags.Bevel | PointFlags.Innerbevel)) != 0)
+	                {
+		                BevelJoin(ref p0, ref p1, lw, rw, lu, ru);
+	                }
+	                else
+	                {
+		                _stroke.Add(new Vertex(p1.Position + (p1.MatrixDeterminant * lw), lu, 1.0f));
+		                _stroke.Add(new Vertex(p1.Position - (p1.MatrixDeterminant * rw), ru, 1.0f));
+	                }
 
-                    p0 = p1;
+	                p0 = ref p1;
                 }
 
                 _stroke.Add(new Vertex(_stroke[0].Pos, lu, 1.0f));
@@ -372,5 +381,20 @@ namespace SilkyNvg.Rendering
             ExpandFillStroke(woff, fringe, convex, w);
         }
 
+        public void Dispose()
+        {
+	        _bevelCount = default;
+		    _bounds = RectangleF.FromLTRB(1e6f, 1e6f, -1e6f, -1e6f);
+	        Closed = default;
+	        Convex = default;
+	        Winding = default;
+	        
+	        _points.Dispose();
+	        _points.Capacity = INIT_POINTS_SIZE;
+	        _fill.Dispose();
+	        _fill.Capacity = INIT_VERTS_SIZE;
+	        _stroke.Dispose();
+	        _stroke.Capacity = INIT_VERTS_SIZE;
+        }
     }
 }

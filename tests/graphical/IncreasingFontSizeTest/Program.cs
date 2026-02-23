@@ -1,4 +1,6 @@
-﻿using Silk.NET.Input;
+﻿using System;
+
+using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -51,7 +53,7 @@ namespace OpenGL_Example
             nvg.FillColour(nvg.Rgba(255, 255, 255, 128));
 
             nvg.TextAlign(Align.Left | Align.Middle);
-            _ = nvg.Text(x, y + (h * 0.5f), text);
+            _ = nvg.Text(x, y + (h * 0.5f), text.AsMemory());
         }
 
         private static void Render(double d)

@@ -11,4 +11,8 @@
     <ProjectReference Include="..\..\SilkyNvg.Common\SilkyNvg.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Collections.Pooled" Version="1.0.82" />
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,7 @@ using SilkyNvg.Paths;
 
 namespace SilkyNvg.Core.Instructions
 {
-    internal class WindingInstruction : IInstruction
+    internal struct WindingInstruction
     {
         private readonly Winding _winding;
         private readonly PathCache _pathCache;
@@ -14,9 +14,9 @@ namespace SilkyNvg.Core.Instructions
             _pathCache = pathCache;
         }
 
-        public void BuildPaths()
+        public static void BuildPaths(WindingInstruction windingInstruction)
         {
-            _pathCache.LastPath.Winding = _winding;
+	        windingInstruction._pathCache.LastPath.Winding = windingInstruction._winding;
         }
     }
 }

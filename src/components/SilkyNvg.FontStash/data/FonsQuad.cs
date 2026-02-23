@@ -1,6 +1,6 @@
 ﻿namespace FontStash.NET
 {
-    public class FonsQuad
+    public struct FonsQuad
     {
 
         public float x0, y0, s0, t0;

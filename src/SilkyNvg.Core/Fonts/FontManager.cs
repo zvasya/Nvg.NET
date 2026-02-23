@@ -59,7 +59,8 @@ namespace SilkyNvg.Core.Fonts
 
         public void FlushTextTexture()
         {
-            if (Fontstash.ValidateTexture(out int[] dirty))
+	        Span<int> dirty = stackalloc int[4]; 
+            if (Fontstash.ValidateTexture(dirty))
             {
                 int fontImage = _fontImages[_fontImageIdx];
                 if (fontImage != 0)
@@ -150,7 +151,7 @@ namespace SilkyNvg.Core.Fonts
             return true;
         }
 
-        public void RenderText(ICollection<Vertex> vertices)
+        public void RenderText(ReadOnlySpan<Vertex> vertices)
         {
             State state = _nvg.stateStack.CurrentState;
             Paint paint = state.Fill;
@@ -161,7 +162,7 @@ namespace SilkyNvg.Core.Fonts
 
             _nvg.renderer.Triangles(paint, state.CompositeOperation, state.Scissor, vertices, _nvg.pixelRatio.FringeWidth);
 
-            _nvg.FrameMeta.Update((uint)vertices.Count / 3, 0, 0, 1);
+            _nvg.FrameMeta.Update((uint)vertices.Length / 3, 0, 0, 1);
         }
 
         public void Dispose()

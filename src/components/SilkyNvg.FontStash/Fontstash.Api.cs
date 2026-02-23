@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Numerics;
 
 namespace FontStash.NET
 {
@@ -382,14 +383,14 @@ namespace FontStash.NET
             }
             else if ((state.align & (int)FonsAlign.Right) != 0)
             {
-                float width = TextBounds(x, y, str, end, out float[] _);
+                float width = TextBounds(x, y, str.AsMemory(), end.AsMemory(), out Vector4 _);
                 x -= width;
 
             }
             else if ((state.align & (int)FonsAlign.Center) != 0)
             {
                 float[] _ = Array.Empty<float>();
-                float width = TextBounds(x, y, str, end, out float[] _);
+                float width = TextBounds(x, y, str.AsMemory(), end.AsMemory(), out Vector4 _);
                 x -= width * 0.5f;
             }
 
@@ -432,7 +433,7 @@ namespace FontStash.NET
         #endregion
 
         #region Measure Text
-        public float TextBounds(float x, float y, string str, string end, out float[] bounds)
+        public float TextBounds(float x, float y, ReadOnlyMemory<Char> str, ReadOnlyMemory<Char> end, out Vector4 bounds)
         {
             FonsState state = GetState();
             uint codepoint = 0;
@@ -441,7 +442,7 @@ namespace FontStash.NET
             int prevGlyphIndex = -1;
             short isize = (short)(state.size * 10.0f);
             short iblur = (short)state.blur;
-            bounds = new float[] { -1, -1, -1, -1 };
+            bounds = new Vector4(-1, -1, -1, -1);
 
             if (state.font < 0 || state.font >= _nfonts)
                 return x;
@@ -459,10 +460,10 @@ namespace FontStash.NET
 
             for (int i = 0; i < str.Length; i++)
             {
-                if (end != null && string.Compare(str, i, end, 0, end.Length) == 0)
+                if (end.Length > 0 && StringUtils.Equal(str, i, end, 0, end.Length))
                     break;
 
-                if (Utf8.DecUtf8(ref utf8state, ref codepoint, str[i]) != 0)
+                if (Utf8.DecUtf8(ref utf8state, ref codepoint, str.Span[i]) != 0)
                     continue;
                 
                 glyph = GetGlyph(font, codepoint, isize, iblur, FonsGlyphBitmap.Optional);
@@ -508,10 +509,10 @@ namespace FontStash.NET
                 maxx -= advance * 0.5f;
             }
 
-            bounds[0] = minx;
-            bounds[1] = miny;
-            bounds[2] = maxx;
-            bounds[3] = maxy;
+            bounds.X = minx;
+            bounds.Y = miny;
+            bounds.Z = maxx;
+            bounds.W = maxy;
 
             return advance;
         }
@@ -561,7 +562,7 @@ namespace FontStash.NET
         #endregion
 
         #region Text iterator
-        public bool TextIterInit(out FonsTextIter iter, float x, float y, string str, string end, FonsGlyphBitmap bitmapOption)
+        public bool TextIterInit(out FonsTextIter iter, float x, float y, ReadOnlyMemory<Char> str, ReadOnlyMemory<Char> end, FonsGlyphBitmap bitmapOption)
         {
             FonsState state = GetState();
 
@@ -583,12 +584,12 @@ namespace FontStash.NET
             }
             else if ((state.align & (int)FonsAlign.Right) != 0)
             {
-                float width = TextBounds(x, y, str, end, out float[] _);
+                float width = TextBounds(x, y, str, end, out Vector4 _);
                 x -= width;
             }
             else if ((state.align & (int)FonsAlign.Center) != 0)
             {
-                float width = TextBounds(x, y, str, end, out float[] _);
+                float width = TextBounds(x, y, str, end, out Vector4 _);
                 x -= width * 0.5f;
             }
 
@@ -610,10 +611,10 @@ namespace FontStash.NET
         public bool TextIterNext(ref FonsTextIter iter, ref FonsQuad quad)
         {
             FonsGlyph glyph = null;
-            string str = iter.next;
+            ReadOnlyMemory<Char> str = iter.next;
             iter.str = iter.next;
 
-            if (str.Length == 0 || str == iter.end)
+            if (str.Length == 0 || StringUtils.Equal(str, iter.end))
             {
                 return false;
             }
@@ -621,10 +622,10 @@ namespace FontStash.NET
             int i;
             for (i = 0; i < str.Length; i++)
             {
-                if (iter.end != null && string.Compare(str, i, iter.end, 0, iter.end.Length) == 0)
+                if (iter.end.Length > 0 && StringUtils.Equal(str, i, iter.end, 0, iter.end.Length))
                     break;
 
-                if (Utf8.DecUtf8(ref iter.utf8state, ref iter.codepoint, str[i]) != 0)
+                if (Utf8.DecUtf8(ref iter.utf8state, ref iter.codepoint, str.Span[i]) != 0)
                     continue;
 
                 iter.x = iter.nextx;
@@ -635,7 +636,7 @@ namespace FontStash.NET
                 iter.prevGlyphIndex = glyph != null ? glyph.index : INVALID;
                 break;
             }
-            iter.next = str.Remove(0, i + 1);
+            iter.next = str.Slice(i + 1);
 
             return true;
         }
@@ -649,9 +650,9 @@ namespace FontStash.NET
             return _texData;
         }
 
-        public bool ValidateTexture(out int[] dirty)
+        public bool ValidateTexture(Span<int> dirty)
         {
-            dirty = new int[] { -1, -1, -1, -1 };
+            dirty.Fill(-1);
             if (_dirtyRect[0] < _dirtyRect[2] && _dirtyRect[1] < _dirtyRect[3])
             {
                 dirty[0] = _dirtyRect[0];

@@ -243,7 +243,7 @@ namespace FontStash.NET
 
             if (prevGlyphIndex != INVALID)
             {
-                float adv = FonsTt.GetGlyphKernAdvance(font.font, prevGlyphIndex, glyph.index) * scale;
+                float adv = font.font.GetGlyphKernAdvance( prevGlyphIndex, glyph.index) * scale;
                 x += (int)(adv + spacing + 0.5f);
             }
 

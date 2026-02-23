@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace SilkyNvg.Core.Instructions
 {
-    internal class LineToInstruction : IInstruction
+    internal struct LineToInstruction
     {
         private readonly Vector2 _position;
         private readonly PathCache _pathCache;
@@ -15,9 +15,9 @@ namespace SilkyNvg.Core.Instructions
             _pathCache = pathCache;
         }
 
-        public void BuildPaths()
+        public static void BuildPaths(LineToInstruction lineToInstruction)
         {
-            _pathCache.LastPath.AddPoint(_position, PointFlags.Corner);
+	        lineToInstruction._pathCache.LastPath.AddPoint(lineToInstruction._position, PointFlags.Corner);
         }
     }
 }

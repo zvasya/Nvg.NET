@@ -9,21 +9,15 @@ namespace SilkyNvg.Core.States
 
         private readonly Stack<State> _states;
 
-        public State CurrentState
+        private State _currentState;
+        public ref State CurrentState
         {
-            get => _states.Peek();
-            private set
-            {
-                _ = _states.Pop();
-                _states.Push(value);
-            }
+            get => ref _currentState;
         }
 
         public StateStack()
         {
             _states = new Stack<State>((int)MAX_STATES);
-
-            Save();
             Reset();
         }
 
@@ -33,33 +27,30 @@ namespace SilkyNvg.Core.States
             {
                 return;
             }
-            else if (_states.Count > 0)
-            {
-                _states.Push(_states.Peek().Clone());
-            }
             else
             {
-                _states.Push(State.Default);
+	            _states.Push(_currentState);
             }
         }
 
         public void Reset()
         {
-            _states.Peek().Reset();
+	        _currentState = State.Default;
         }
 
         public void Restore()
         {
-            if (_states.Count <= 1)
+            if (_states.Count == 0)
             {
                 return;
             }
-            _ = _states.Pop();
+            _currentState = _states.Pop();
         }
 
         public void Clear()
         {
             _states.Clear();
+            Reset();
         }
 
     }

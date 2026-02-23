@@ -34,11 +34,11 @@ namespace SilkyNvg.Rendering.OpenGL
             _vertices[_count++] = vertex;
         }
 
-        public void AddVertices(ICollection<Vertex> vertices)
+        public void AddVertices(ReadOnlySpan<Vertex> vertices)
         {
-            AllocVerts(vertices.Count);
-            vertices.CopyTo(_vertices, _count);
-            _count += vertices.Count;
+            AllocVerts(vertices.Length);
+            vertices.CopyTo(_vertices.AsSpan(_count));
+            _count += vertices.Length;
         }
 
         public void Clear()

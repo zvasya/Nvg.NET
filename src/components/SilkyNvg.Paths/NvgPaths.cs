@@ -490,7 +490,7 @@ namespace SilkyNvg.Paths
 
             foreach (Path path in nvg.pathCache.Paths)
             {
-                nvg.FrameMeta.Update(0, 0, (uint)path.Fill.Count - 2 + (uint)path.Stroke.Count - 2, 2);
+                nvg.FrameMeta.Update(0, 0, (uint)path.FillCount - 2 + (uint)path.StrokeCount - 2, 2);
             }
         }
 
@@ -528,7 +528,7 @@ namespace SilkyNvg.Paths
 
             foreach (Path path in nvg.pathCache.Paths)
             {
-                nvg.FrameMeta.Update(0, (uint)path.Stroke.Count - 2, 0, 1);
+                nvg.FrameMeta.Update(0, (uint)path.StrokeCount - 2, 0, 1);
             }
         }
 

@@ -1,8 +1,9 @@
-﻿namespace SilkyNvg.Blending
-{
-    public struct CompositeOperationState
-    {
+﻿using System;
 
+namespace SilkyNvg.Blending
+{
+    public struct CompositeOperationState : IEquatable<CompositeOperationState>
+    {
         public BlendFactor SrcRgb { get; }
 
         public BlendFactor DstRgb { get; }
@@ -81,6 +82,24 @@
             SrcRgb = SrcAlpha = srcFactor;
             DstRgb = DstAlpha = dstFactor;
         }
+
+        public bool Equals(CompositeOperationState other)
+        {
+	        return SrcRgb == other.SrcRgb && DstRgb == other.DstRgb && SrcAlpha == other.SrcAlpha && DstAlpha == other.DstAlpha;
+        }
+
+        public override bool Equals(object obj)
+        {
+	        return obj is CompositeOperationState other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+	        return HashCode.Combine((int)SrcRgb, (int)DstRgb, (int)SrcAlpha, (int)DstAlpha);
+        }
+        
+        public static bool operator ==(CompositeOperationState left, CompositeOperationState right) => left.Equals(right);
+        public static bool operator !=(CompositeOperationState left, CompositeOperationState right) => !left.Equals(right);
 
     }
 }

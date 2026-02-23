@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace SilkyNvg.Rendering
 {
-    internal class Point
+    internal struct Point
     {
 
         public Vector2 Position { get; }
@@ -17,11 +17,15 @@ namespace SilkyNvg.Rendering
         public Vector2 MatrixDeterminant { get; private set; }
 
         public PointFlags Flags { get; internal set; }
+        
 
         public Point(Vector2 position, PointFlags flags)
         {
             Position = position;
             Flags = flags;
+            Determinant = default;
+            Length = 0;
+            MatrixDeterminant = default;
         }
 
         public void SetDeterminant(Point other)
@@ -251,7 +255,7 @@ namespace SilkyNvg.Rendering
             }
         }
 
-        public void Join(Point other, float iw, bool bevelOrRound, float miterLimit, ref uint nleft, ref uint bevelCount)
+        public void Join(ref  Point other, float iw, bool bevelOrRound, float miterLimit, ref uint nleft, ref uint bevelCount)
         {
             Vector2 dl0 = new Vector2(other.Determinant.Y, -other.Determinant.X);
             Vector2 dl1 = new Vector2(Determinant.Y, -Determinant.X);
@@ -305,21 +309,22 @@ namespace SilkyNvg.Rendering
             return Maths.PtEquals(p0.Position, p1.Position, tol);
         }
 
-        public static float PolyArea(IList<Point> points)
+        public static float PolyArea(ReadOnlySpan<Point> points)
         {
             float area = 0;
-            for (int i = 2; i < points.Count; i++)
+            int pointsLength = points.Length;
+	        Vector2 a = points[0].Position;
+            for (int i = 2; i < pointsLength; i++)
             {
-                Point a = points[0];
-                Point b = points[i - 1];
-                Point c = points[i];
-                area += Maths.Triarea2(a.Position, b.Position, c.Position);
+	            Vector2 b = points[i - 1].Position;
+	            Vector2 c = points[i].Position;
+                area += Maths.Triarea2(a, b, c);
             }
 
             return area * 0.5f;
         }
 
-        public static void Vertex(Point p0, Point p1, float woff, ICollection<Vertex> verts)
+        public static void Vertex(in Point p0, in Point p1, float woff, ICollection<Vertex> verts)
         {
             if ((p1.Flags & PointFlags.Bevel) != 0)
             {
@@ -333,8 +338,8 @@ namespace SilkyNvg.Rendering
                 }
                 else
                 {
-                    Vector2 l0 = (p1.Position + dl0) * woff;
-                    Vector2 l1 = (p1.Position + dl1) * woff;
+                    Vector2 l0 = p1.Position + dl0 * woff;
+                    Vector2 l1 = p1.Position + dl1 * woff;
                     verts.Add(new Vertex(l0, 0.5f, 1.0f));
                     verts.Add(new Vertex(l1, 0.5f, 1.0f));
                 }
@@ -363,6 +368,5 @@ namespace SilkyNvg.Rendering
         {
             return new Point(a.Position - b.Position, a.Flags);
         }
-
     }
 }

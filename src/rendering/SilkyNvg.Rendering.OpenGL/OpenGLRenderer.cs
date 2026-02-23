@@ -223,26 +223,26 @@ namespace SilkyNvg.Rendering.OpenGL
             Shader.UniformManager.Clear();
         }
 
-        public void Fill(Paint paint, CompositeOperationState compositeOperation, Scissor scissor, float fringe, RectangleF bounds, IReadOnlyList<Rendering.Path> paths)
+        public void Fill(Paint paint, CompositeOperationState compositeOperation, Scissor scissor, float fringe, RectangleF bounds, ReadOnlySpan<Rendering.Path> paths)
         {
             int offset = _vertexCollection.CurrentsOffset;
-            Path[] renderPaths = new Path[paths.Count];
-            for (int i = 0; i < paths.Count; i++)
+            Path[] renderPaths = new Path[paths.Length];
+            for (int i = 0; i < paths.Length; i++)
             {
                 Rendering.Path path = paths[i];
                 renderPaths[i] = new Path(
-                    _vertexCollection.CurrentsOffset, path.Fill.Count,
-                    _vertexCollection.CurrentsOffset + path.Fill.Count, path.Stroke.Count
+                    _vertexCollection.CurrentsOffset, path.FillCount,
+                    _vertexCollection.CurrentsOffset + path.FillCount, path.StrokeCount
                 );
                 _vertexCollection.AddVertices(path.Fill);
                 _vertexCollection.AddVertices(path.Stroke);
-                offset += path.Fill.Count;
-                offset += path.Stroke.Count;
+                offset += path.FillCount;
+                offset += path.StrokeCount;
             }
 
             FragUniforms uniforms = new FragUniforms(paint, scissor, fringe, fringe, -1.0f, this);
             Call call;
-            if ((paths.Count == 1) && paths[0].Convex) // Convex
+            if ((paths.Length == 1) && paths[0].Convex) // Convex
             {
                 int uniformOffset = Shader.UniformManager.AddUniform(uniforms);
                 call = new ConvexFillCall(paint.Image, renderPaths, uniformOffset, compositeOperation, this);
@@ -264,22 +264,22 @@ namespace SilkyNvg.Rendering.OpenGL
             _callQueue.Add(call);
         }
 
-        public void Stroke(Paint paint, CompositeOperationState compositeOperation, Scissor scissor, float fringe, float strokeWidth, IReadOnlyList<Rendering.Path> paths)
+        public void Stroke(Paint paint, CompositeOperationState compositeOperation, Scissor scissor, float fringe, float strokeWidth, ReadOnlySpan<Rendering.Path> paths)
         {
             int offset = _vertexCollection.CurrentsOffset;
-            Path[] renderPaths = new Path[paths.Count];
-            for (int i = 0; i < paths.Count; i++)
+            Path[] renderPaths = new Path[paths.Length];
+            for (int i = 0; i < paths.Length; i++)
             {
-                if (paths[i].Stroke.Count > 0)
+                if (paths[i].StrokeCount > 0)
                 {
-                    renderPaths[i] = new Path(0, 0, offset, paths[i].Stroke.Count);
+                    renderPaths[i] = new Path(0, 0, offset, paths[i].StrokeCount);
                 }
                 else
                 {
                     renderPaths[i] = default;
                 }
                 _vertexCollection.AddVertices(paths[i].Stroke);
-                offset += paths[i].Stroke.Count;
+                offset += paths[i].StrokeCount;
             }
 
             FragUniforms uniforms = new FragUniforms(paint, scissor, strokeWidth, fringe, -1.0f, this);
@@ -300,14 +300,14 @@ namespace SilkyNvg.Rendering.OpenGL
             _callQueue.Add(call);
         }
 
-        public void Triangles(Paint paint, CompositeOperationState compositeOperation, Scissor scissor, ICollection<Vertex> vertices, float fringe)
+        public void Triangles(Paint paint, CompositeOperationState compositeOperation, Scissor scissor, ReadOnlySpan<Vertex> vertices, float fringe)
         {
             int offset = _vertexCollection.CurrentsOffset;
             _vertexCollection.AddVertices(vertices);
 
             FragUniforms uniforms = new FragUniforms(paint, scissor, fringe, this);
             int uniformOffset = Shader.UniformManager.AddUniform(uniforms);
-            Call call = new TrianglesCall(paint.Image, new Blend(compositeOperation, this), offset, (uint)vertices.Count, uniformOffset, this);
+            Call call = new TrianglesCall(paint.Image, new Blend(compositeOperation, this), offset, (uint)vertices.Length, uniformOffset, this);
             _callQueue.Add(call);
         }
 

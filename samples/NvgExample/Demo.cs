@@ -6,7 +6,9 @@ using SilkyNvg.Scissoring;
 using SilkyNvg.Text;
 using SilkyNvg.Transforms;
 using System;
+using System.Buffers;
 using System.Drawing;
+using System.IO;
 using System.Numerics;
 
 namespace NvgExample
@@ -20,6 +22,24 @@ namespace NvgExample
         private const int ICON_CHECK = 0x2713;
         private const int ICON_LOGIN = 0xE740;
         private const int ICON_TRASH = 0xE729;
+
+        private string _iconSearch;
+        private string IconSearch => _iconSearch ??= CpToUTF8(ICON_SEARCH);
+        
+        private string _iconCircledCross;
+        private string IconCircledCross => _iconCircledCross ??= CpToUTF8(ICON_CIRCLED_CROSS);
+        
+        private string _IconChevronRight;
+        private string IconChevronRight => _IconChevronRight ??= CpToUTF8(ICON_CHEVRON_RIGHT);
+        
+        private string _iconCheck;
+        private string IconCheck => _iconCheck ??= CpToUTF8(ICON_CHECK);
+        
+        private string _iconLogin;
+        private string IconLogin => _iconLogin ??= CpToUTF8(ICON_LOGIN);
+        
+        private string _iconTrash;
+        private string IconTrash => _iconTrash ??= CpToUTF8(ICON_TRASH);
 
         private readonly int _fontNormal, _fontBold, _fontIcons, _fontEmoji;
         private readonly int[] _images = new int[12];
@@ -91,7 +111,7 @@ namespace NvgExample
             _nvg.FontFace("icons");
             _nvg.FillColour(_nvg.Rgba(255, 255, 255, 64));
             _nvg.TextAlign(Align.Centre | Align.Middle);
-            _ = _nvg.Text(x + h * 0.55f, y + h * 0.55f, CpToUTF8(ICON_SEARCH));
+            _ = _nvg.Text(x + h * 0.55f, y + h * 0.55f, IconSearch);
 
             _nvg.FontSize(17.0f);
             _nvg.FontFace("sans");
@@ -104,7 +124,7 @@ namespace NvgExample
             _nvg.FontFace("icons");
             _nvg.FillColour(_nvg.Rgba(255, 255, 255, 32));
             _nvg.TextAlign(Align.Centre | Align.Middle);
-            _ = _nvg.Text(x + w - h * 0.55f, y + h * 0.55f, CpToUTF8(ICON_CIRCLED_CROSS));
+            _ = _nvg.Text(x + w - h * 0.55f, y + h * 0.55f, IconCircledCross);
         }
 
         private void DrawDropDown(string text, float x, float y, float w, float h)
@@ -132,7 +152,7 @@ namespace NvgExample
             _nvg.FontFace("icons");
             _nvg.FillColour(_nvg.Rgba(255, 255, 255, 64));
             _nvg.TextAlign(Align.Centre | Align.Middle);
-            _nvg.Text(x + w - h * 0.5f, y + h * 0.5f, CpToUTF8(ICON_CHEVRON_RIGHT));
+            _nvg.Text(x + w - h * 0.5f, y + h * 0.5f, IconChevronRight);
         }
 
         private void DrawLable(string text, float x, float y, float h)
@@ -208,10 +228,10 @@ namespace NvgExample
             _nvg.FontFace("icons");
             _nvg.FillColour(_nvg.Rgba(255, 255, 255, 128));
             _nvg.TextAlign(Align.Centre | Align.Middle);
-            _nvg.Text(x + 9.0f + 2.0f, y + h * 0.5f, CpToUTF8(ICON_CHECK));
+            _nvg.Text(x + 9.0f + 2.0f, y + h * 0.5f, IconCheck);
         }
 
-        private void DrawButton(int preIcon, string text, float x, float y, float w, float h, Colour col)
+        private void DrawButton(string preIcon, string text, float x, float y, float w, float h, Colour col)
         {
             const float cornerRadius = 4.0f;
             float iw = 0.0f;
@@ -235,21 +255,21 @@ namespace NvgExample
             _nvg.FontSize(17.0f);
             _nvg.FontFace("sans-bold");
             float tw = _nvg.TextBounds(0.0f, 0.0f, text, out _);
-            if (preIcon != 0)
+            if (preIcon != null)
             {
                 _nvg.FontSize(h * 1.3f);
                 _nvg.FontFace("icons");
-                iw = _nvg.TextBounds(0.0f, 0.0f, CpToUTF8(preIcon), out _);
+                iw = _nvg.TextBounds(0.0f, 0.0f, preIcon, out _);
                 iw += h * 0.15f;
             }
 
-            if (preIcon != 0)
+            if (preIcon != null)
             {
                 _nvg.FontSize(h * 1.3f);
                 _nvg.FontFace("icons");
                 _nvg.FillColour(_nvg.Rgba(255, 255, 255, 96));
                 _nvg.TextAlign(Align.Left | Align.Middle);
-                _nvg.Text(x + w * 0.5f - tw * 0.5f - iw * 0.75f, y + h * 0.5f, CpToUTF8(preIcon));
+                _nvg.Text(x + w * 0.5f - tw * 0.5f - iw * 0.75f, y + h * 0.5f, preIcon);
             }
 
             _nvg.FontSize(17.0f);
@@ -370,15 +390,15 @@ namespace NvgExample
         {
             float dx = w / 5.0f;
 
-            Span<float> samples =
-            [
+            Span<float> samples = stackalloc float[]
+            {
                 (1 + MathF.Sin(t * 1.2345f + MathF.Cos(t * 0.33457f) * 0.44f)) * 0.5f,
                 (1 + MathF.Sin(t * 0.68363f + MathF.Cos(t * 1.3f) * 1.55f)) * 0.5f,
                 (1 + MathF.Sin(t * 1.1642f + MathF.Cos(t * 0.33457f) * 1.24f)) * 0.5f,
                 (1 + MathF.Sin(t * 0.56345f + MathF.Cos(t * 1.63f) * 0.14f)) * 0.5f,
                 (1 + MathF.Sin(t * 1.6245f + MathF.Cos(t * 0.254f) * 0.3f)) * 0.5f,
                 (1 + MathF.Sin(t * 0.345f + MathF.Cos(t * 0.03f) * 0.6f)) * 0.5f
-            ];
+            };
 
             Span<float> sx = stackalloc float[6];
             Span<float> sy = stackalloc float[6];
@@ -681,13 +701,13 @@ namespace NvgExample
             _nvg.Restore();
         }
 
-        private unsafe void DrawLines(float x, float y, float w, float h, float t)
+        private void DrawLines(float x, float y, float w, float h, float t)
         {
             float pad = 5.0f;
             float s = w / 9.0f - pad * 2;
-            float* pts = stackalloc float[4 * 2];
-            LineCap[] joins = { LineCap.Miter, LineCap.Round, LineCap.Bevel };
-            LineCap[] caps = { LineCap.Butt, LineCap.Round, LineCap.Square };
+            Span<float> pts = stackalloc float[4 * 2];
+            Span<LineCap> joins = stackalloc LineCap[] { LineCap.Miter, LineCap.Round, LineCap.Bevel };
+            Span<LineCap> caps = stackalloc LineCap[] { LineCap.Butt, LineCap.Round, LineCap.Square };
 
             _nvg.Save();
             pts[0] = -s * 0.25f + MathF.Cos(t * 0.3f) * s * 0.5f;
@@ -805,12 +825,15 @@ namespace NvgExample
             _nvg.TextAlign(Align.Left | Align.Top);
             _nvg.TextMetrics(out _, out _, out float lineh);
 
-            string start = text;
+            ReadOnlyMemory<char> start = text.AsMemory();
             string end = null;
             int nrows;
-            while ((nrows = _nvg.TextBreakLines(start, end, width, out TextRow[] rows, 3)) != 0)
+            int maxRow = 3;
+            var textRows = ArrayPool<TextRow>.Shared.Rent(maxRow);
+            Span<TextRow> rows = textRows.AsSpan(0,maxRow);
+            while ((nrows = _nvg.TextBreakLines(start, end.AsMemory(), width, rows)) != 0)
             {
-                for (uint i = 0; i < nrows; i++)
+                for (int i = 0; i < nrows; i++)
                 {
                     TextRow row = rows[i];
                     bool hit = mx > x && mx < (x + width) && my >= y && my < (y + lineh);
@@ -856,6 +879,7 @@ namespace NvgExample
                 start = rows[^1].Next;
             }
 
+            ArrayPool<TextRow>.Shared.Return(textRows);
             if (gutter != 0)
             {
                 _nvg.FontSize(12.0f);
@@ -925,7 +949,7 @@ namespace NvgExample
         {
             const float lineWidth = 8.0f;
 
-            LineCap[] caps =
+            Span<LineCap> caps = stackalloc LineCap[]
             {
                 LineCap.Butt,
                 LineCap.Round,
@@ -945,7 +969,7 @@ namespace NvgExample
             _nvg.Fill();
 
             _nvg.StrokeWidth(lineWidth);
-            for (uint i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 _nvg.LineCap(caps[i]);
                 _nvg.StrokeColour(Colour.Black);
@@ -1027,7 +1051,7 @@ namespace NvgExample
             DrawEditBox("Password", x, y, 280.0f, 28.0f);
             y += 38.0f;
             DrawCheckBox("Remember me", x, y, 140.0f, 28.0f);
-            DrawButton(ICON_LOGIN, "Sign in", x + 138.0f, y, 140.0f, 28.0f, _nvg.Rgba(0, 96, 128, 255));
+            DrawButton(IconLogin, "Sign in", x + 138.0f, y, 140.0f, 28.0f, _nvg.Rgba(0, 96, 128, 255));
             y += 45.0f;
 
             DrawLable("Diameter", x, y, 20.0f);
@@ -1036,8 +1060,8 @@ namespace NvgExample
             DrawSlider(0.4f, x, y, 170.0f, 28.0f);
             y += 55.0f;
 
-            DrawButton(ICON_TRASH, "Delete", x, y, 160.0f, 28.0f, _nvg.Rgba(128, 16, 8, 255));
-            DrawButton(0, "Cancel", x + 170.0f, y, 110.0f, 28.0f, _nvg.Rgba(0, 0, 0, 0));
+            DrawButton(IconTrash, "Delete", x, y, 160.0f, 28.0f, _nvg.Rgba(128, 16, 8, 255));
+            DrawButton(null, "Cancel", x + 170.0f, y, 110.0f, 28.0f, _nvg.Rgba(0, 0, 0, 0));
 
             DrawThumbnails(365.0f, popY - 30.0f, 160.0f, 300.0f, _images, t);
 

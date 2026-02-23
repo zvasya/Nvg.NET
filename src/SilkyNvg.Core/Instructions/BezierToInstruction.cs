@@ -2,10 +2,11 @@
 using SilkyNvg.Core.Paths;
 using System;
 using System.Numerics;
+using SilkyNvg.Rendering;
 
 namespace SilkyNvg.Core.Instructions
 {
-    internal class BezierToInstruction : IInstruction
+    internal struct BezierToInstruction
     {
         private const byte MAX_TESSELATION_DEPTH = 10;
 
@@ -26,7 +27,7 @@ namespace SilkyNvg.Core.Instructions
             _pathCache = pathCache;
         }
 
-        private void TesselateBezier(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, byte level, PointFlags flags)
+        private static void TesselateBezier(BezierToInstruction lineToInstruction, Path path, Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, byte level, PointFlags flags)
         {
             if (level > MAX_TESSELATION_DEPTH)
             {
@@ -39,28 +40,32 @@ namespace SilkyNvg.Core.Instructions
             Vector2 p123 = (p12 + p23) * 0.5f;
 
             Vector2 d = p4 - p1;
-            float d2 = MathF.Abs((p2.X - p4.X) * d.Y - (p2.Y - p4.Y) * d.X);
-            float d3 = MathF.Abs((p3.X - p4.X) * d.Y - (p3.Y - p4.Y) * d.X);
+            Vector2 ds = new Vector2(d.Y, d.X);
+            Vector2 p2m4d = (p2 - p4) * ds;
+            Vector2 p3m4d = (p4 - p1) * ds;
+            float d2 = MathF.Abs(p2m4d.X - p2m4d.Y);
+            float d3 = MathF.Abs(p3m4d.X - p3m4d.Y);
 
-            if ((d2 + d3) * (d2 + d3) < _tessTol * (d.X * d.X + d.Y * d.Y))
+            float d23 = d2 + d3;
+            if (d23 * d23 < lineToInstruction._tessTol * (d.X * d.X + d.Y * d.Y))
             {
-                _pathCache.LastPath.AddPoint(p4, flags);
+	            path.AddPoint(p4, flags);
                 return;
             }
 
             Vector2 p234 = (p23 + p34) * 0.5f;
             Vector2 p1234 = (p123 + p234) * 0.5f;
 
-            TesselateBezier(p1, p12, p123, p1234, (byte)(level + 1), 0);
-            TesselateBezier(p1234, p234, p34, p4, (byte)(level + 1), flags);
+            TesselateBezier(lineToInstruction, path, p1, p12, p123, p1234, (byte)(level + 1), 0);
+            TesselateBezier(lineToInstruction, path, p1234, p234, p34, p4, (byte)(level + 1), flags);
         }
 
-        public void BuildPaths()
+        public static void BuildPaths(BezierToInstruction lineToInstruction)
         {
-            if (_pathCache.LastPath.PointCount > 0)
+            if (lineToInstruction._pathCache.LastPath.PointCount > 0)
             {
-                Vector2 last = _pathCache.LastPath.LastPoint;
-                TesselateBezier(last, _p0, _p1, _p2, 0, PointFlags.Corner);
+                Vector2 last = lineToInstruction._pathCache.LastPath.LastPoint;
+                TesselateBezier(lineToInstruction, lineToInstruction._pathCache.LastPath, last, lineToInstruction._p0, lineToInstruction._p1, lineToInstruction._p2, 0, PointFlags.Corner);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Numerics;
+
 using SilkyNvg.Rendering;
 
 namespace SilkyNvg.Scissoring
