@@ -2,6 +2,7 @@
   <Folder Name="/examples/">
     <Project Path="samples/NvgExample/NvgExample.csproj" />
     <Project Path="samples/OpenGL Example/OpenGL Example.csproj" />
+    <Project Path="samples/Vulkan Example/Vulkan Example.csproj" />
   </Folder>
   <Folder Name="/source/">
     <Project Path="src/SilkyNvg.Common/SilkyNvg.Common.csproj" />
@@ -21,6 +22,7 @@
   </Folder>
   <Folder Name="/source/renderers/">
     <Project Path="src/rendering/SilkyNvg.Rendering.OpenGL/SilkyNvg.Rendering.OpenGL.csproj" />
+    <Project Path="src/rendering/SilkyNvg.Rendering.Vulkan/SilkyNvg.Rendering.Vulkan.csproj" />
     <Project Path="src/rendering/SilkyNvg.Rendering/SilkyNvg.Rendering.csproj" />
   </Folder>
   <Folder Name="/tests/" />
